@@ -13,10 +13,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-SOURCES += \
-        main.cpp
+SOURCES += main.cpp \
+    src/dx_iface.cpp \
+    src/maploader.cpp
 
 RESOURCES += qml.qrc
+
+INCLUDEPATH += libiconv/include
+INCLUDEPATH += libdxfrw/src
 
 TRANSLATIONS += \
     NewDPR_en_US.ts
@@ -31,3 +35,24 @@ QML_DESIGNER_IMPORT_PATH =
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    libiconv/include/encodings.def \
+    libiconv/include/encodings_aix.def \
+    libiconv/include/encodings_dos.def \
+    libiconv/include/encodings_extra.def \
+    libiconv/include/encodings_local.def \
+    libiconv/include/encodings_osf1.def \
+    libiconv/include/translit.def
+
+HEADERS += \
+    src/dx_data.h \
+    src/dx_iface.h \
+    src/maploader.h
+
+win32: LIBS += -L$$PWD/libdxfrw/bin/ -llibdxfrw
+win32: LIBS += -L$$PWD/libdxfrw/vs/packages/libiconv.1.14.0.11/build/native/lib/v110/x64/Release/dynamic/cdecl/ -llibiconv_dynamic
+win32: LIBS += -L$$PWD/libdxfrw/vs/packages/libiconv.1.14.0.11/build/native/lib/v110/x64/Release/static/cdecl/ -llibiconv_static
+
+INCLUDEPATH += $$PWD/''
+DEPENDPATH += $$PWD/''

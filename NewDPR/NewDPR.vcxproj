@@ -92,11 +92,11 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include;D:\Home\WK\DPRExt\libdxfrw\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include;$(ProjectDir)..\libdxfrw\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\libdxfrw\bin;D:\Home\WK\DPRExt\Bin\Release;$(DXSDK_DIR)\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\libdxfrw\bin;$(ProjectDir)..\Bin\Release;$(DXSDK_DIR)\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libdxfrw_d.lib;libiconv_dynamic.lib;libiconv_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>

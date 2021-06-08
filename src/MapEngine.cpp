@@ -229,6 +229,7 @@ bool CMapEngine::loadDwgMap(std::string strImagePath)
 }
 void CMapEngine::DoDraw()
 {
+	OutputDebugString(LOCATION);
 	HRESULT hr = 0;
 	if(m_pd3dDevice)
 	{
@@ -490,17 +491,19 @@ void  CMapEngine::ExtractDwgEntityData(DRW_Entity *pDwgEntity, CBasicLayer* pLay
 			pNewEntity = DwgPolylineBaseToPolyLine((DRW_LWPolyline *)pDwgEntity, pAlteration);
 			pNewEntity->SetParent(pLayer);
 			break;
-		case DRW::MTEXT: 
+		case DRW::MTEXT: //CADTextToTextEntity
 			break;
-		case DRW::TEXT: 
+		case DRW::TEXT: //CADTextToTextEntity
 			break;
-		case DRW::CIRCLE: 
+		case DRW::CIRCLE:  //CADCircleToPolygonEntity
 			break;
-		case DRW::ARC: 
+		case DRW::ARC: //DwgPolylineBaseToPolyLine
+			pNewEntity = DwgPolylineBaseToPolyLine((DRW_Arc *)pDwgEntity, pAlteration);
+			pNewEntity->SetParent(pLayer);
 			break;
-		case DRW::HATCH: 
+		case DRW::HATCH: //ExtractDataFromCadInsert
 			break;
-		case DRW::INSERT: 
+		case DRW::INSERT: //ExtractDataFromCadInsert
 			break;
 		case DRW::VIEWPORT: 
 			break;
@@ -581,6 +584,13 @@ CEntity* CMapEngine::DwgPolylineBaseToPolyLine(DRW_LWPolyline * pDwgEntity, CPoi
 
 	return pPolylineEntity;
 }
+CEntity* CMapEngine::DwgPolylineBaseToPolyLine(DRW_Arc * pDwgEntity, CPointAlteration *pAlteration)
+{
+	CEntity* pEntity = NULL;
+
+	return pEntity;
+}
+
 void CMapEngine::GetArpRelativeCoordinates(CPointF *ptSrc, CPointF *ptDst, CPointAlteration *pAlteration)
 {
 	CPointF ptTemp;

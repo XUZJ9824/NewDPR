@@ -222,7 +222,7 @@ public:
 		return cnt;
 	}
 
-	inline int PointsCountPolygons()
+	inline int TotalPolygonPoints()
 	{
 		int cnt = 0;
 		for (std::vector<CPolygonEntity*>::const_iterator it = m_lstPolygons.begin(); it != m_lstPolygons.end(); it++)

@@ -73,17 +73,18 @@ protected:
 	//drawing Element buffer
 	UINT                            m_LineStripsPosBufferSize;
 	LPDIRECT3DVERTEXBUFFER9         m_LineStripsPosBuffer;
+	bool                            m_LineStripsBuffersInitialized;
+
 	//LPDIRECT3DVERTEXBUFFER9         m_pGeometryColorVertexBuffer;
 	//IDirect3DIndexBuffer9*          m_pGeometryIndexVertexBuffer;
 	LPDIRECT3DVERTEXDECLARATION9    m_pVertexDeclaration;
 	int                             m_MaxIndex;
-	int                             m_SegmentCount;
-	bool                            m_GeometryBuffersInitialized;
+	int                             m_SegmentCount;	
 
-	LPDIRECT3DVERTEXBUFFER9         m_pPolygonPositionVertexBuffer;
-	//LPDIRECT3DVERTEXBUFFER9         m_pPolygonColorVertexBuffer;
-	//IDirect3DIndexBuffer9*          m_pPolygonIndexVertexBuffer;
-	//IndicesList                     m_PolygonIndices;
+	UINT                            m_PolygonPosBufferSize;
+	LPDIRECT3DVERTEXBUFFER9         m_pPolygonPosBuffer;
+	bool					        m_PolygonPosBufferInitialized;
+	
 	int                             m_PolygonVerticesCount;
 	int                             m_TrianglesCount;
 	int                             m_PolygonMaxIndex;

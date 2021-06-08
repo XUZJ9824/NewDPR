@@ -36,6 +36,7 @@ protected:
 	void        ExtractDwgEntityData(DRW_Entity *pDwgEntity, CBasicLayer* pLayer, CPointAlteration *pAlteration, DRW_Block* pDwgBlk = NULL);
 	CEntity*    DwgLineToLineEntity(DRW_Line *pDwgLine, CPointAlteration *pAlteration);
 	CEntity*    DwgPolylineBaseToPolyLine(DRW_LWPolyline * pDwgEntity, CPointAlteration *pAlteration);
+	CEntity*    DwgPolylineBaseToPolyLine(DRW_Arc * pDwgEntity, CPointAlteration *pAlteration);
 	void        GetArpRelativeCoordinates(CPointF *ptSrc, CPointF *ptDst, CPointAlteration *pAlteration);
 
 	//Color Settings

@@ -28,7 +28,7 @@ CMapLayer::CMapLayer(CMapEngine *pEngine):
 CMapLayer::CMapLayer(CMapEngine *pEngine, std::wstring strLayerName)
 {
 	m_bInitialed = false;
-	m_GeometryBuffersInitialized = false;
+	m_LineStripsBuffersInitialized = false;
 	m_PolygonBuffersInitialized = false;
 	m_bAlreadyGetInfo = false;
 
@@ -56,7 +56,7 @@ CMapLayer::CMapLayer(CMapEngine *pEngine, std::wstring strLayerName)
 CMapLayer::~CMapLayer() 
 {
 	SAFE_RELEASE(m_LineStripsPosBuffer);
-	SAFE_RELEASE(m_pPolygonPositionVertexBuffer);
+	SAFE_RELEASE(m_pPolygonPosBuffer);
 
 	int ii = 0;
 }
@@ -84,6 +84,60 @@ void CMapLayer::GetLayerInfo(std::list<DRW_Layer> *players)
 
 bool CMapLayer::InitPolygonBuffer()
 {
+	int itemPoints;
+	int pointsCount = this->m_Entities.TotalPolygonPoints();
+
+	if (m_pd3dDevice)
+	{
+		// Release old buffers if needed
+		SAFE_RELEASE(m_pPolygonPosBuffer);
+
+		m_PolygonPosBufferSize = pointsCount * sizeof(Vertex);
+
+		//Create Vertex Buffer
+		if (FAILED(m_pd3dDevice->CreateVertexBuffer(m_PolygonPosBufferSize,
+			D3DUSAGE_WRITEONLY,
+			CUSTOMVERTEX,
+			D3DPOOL_DEFAULT,
+			&m_pPolygonPosBuffer, NULL)))
+		{
+			//_ASSERT(0); TBD
+			return false;
+		}
+
+		// Lock them
+		Vertex*  pInternalPositionVertexBuffer;
+		WORD     index = 0;
+		PWORD    pIndex;
+
+		if (FAILED(m_pPolygonPosBuffer->Lock(0, m_PolygonPosBufferSize, (void**)&pInternalPositionVertexBuffer, 0)))
+		{
+			_ASSERT(0); //TBD
+			return false;
+		}
+
+		/*for (std::vector<CLineEntity*>::const_iterator it = this->m_Entities.m_lstLines.begin(); it != m_Entities.m_lstLines.end(); it++)
+		{
+			CLineEntity* pLine = *it;
+			for (std::vector<CLineGeometry*>::const_iterator it2 = pLine->m_lstLineGeometries.begin(); it2 != pLine->m_lstLineGeometries.end(); it2++)
+			{
+				CLineGeometry* pLineGeometry = *it2;
+
+				pInternalPositionVertexBuffer->X = pLineGeometry->m_startPoint.X;
+				pInternalPositionVertexBuffer->Y = pLineGeometry->m_startPoint.Y;
+				pInternalPositionVertexBuffer->dColor = pLine->m_Color;
+				pInternalPositionVertexBuffer++;
+
+				pInternalPositionVertexBuffer->X = pLineGeometry->m_endPoint.X;
+				pInternalPositionVertexBuffer->Y = pLineGeometry->m_endPoint.Y;
+				pInternalPositionVertexBuffer->dColor = pLine->m_Color;
+				pInternalPositionVertexBuffer++;
+			}
+		}*/
+	}
+
+	m_pPolygonPosBuffer->Unlock();
+	m_PolygonPosBufferInitialized = true;
 	return true;
 }
 
@@ -143,7 +197,7 @@ bool CMapLayer::InitLineStripsBuffer()
 	}
 
 	m_LineStripsPosBuffer->Unlock();
-	m_GeometryBuffersInitialized = true;
+	m_LineStripsBuffersInitialized = true;
 	return true;
 }
 

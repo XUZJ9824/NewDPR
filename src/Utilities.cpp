@@ -6,6 +6,8 @@
 
 using namespace std;
 
+tDataCenter gDataCenter;
+
 int Print(const TCHAR *strToPrint)
 {
 	int rt = wcslen(strToPrint);
@@ -295,4 +297,22 @@ void GetColorByIndex(unsigned int iDwgColor, unsigned short &R, unsigned short &
 		G = acad_colors_static[iDwgColor][1];
 		B = acad_colors_static[iDwgColor][2];
 	}
+}
+
+int IsLayerVisible(std::wstring sLayer)
+{
+	int i = -1;
+	int rt = 0;
+	for (std::vector<tDwgLayer>::const_iterator it = gDataCenter.arrDwgLayers.begin(); it != gDataCenter.arrDwgLayers.end(); it++)
+	{
+		i++;
+		if ( (*it).sLayer == sLayer) break;
+	}
+
+	if (i >= 0)
+	{
+		rt = gDataCenter.arrDwgLayers[i].bVisible;
+	}
+
+	return rt;
 }

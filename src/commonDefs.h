@@ -7,6 +7,7 @@
 #include "D3dx9core.h"
 
 #include "tchar.h"
+#include <vector>
 
 #define USE_DWG
 
@@ -69,3 +70,21 @@ void GetColorByIndex(unsigned int iDwgColor, unsigned short &R, unsigned short &
 #define S1(x) #x
 #define S2(x) S1(x)
 #define LOCATION _T(__FUNCTION__ " : " S2(__LINE__) "\n")
+
+typedef struct 
+{
+	std::wstring  sLayer;
+	unsigned char bVisible;
+}tDwgLayer;
+
+typedef struct 
+{
+	//name from each layer, based from dwg map file
+	std::vector<tDwgLayer>  arrDwgLayers;
+}tDataCenter;
+
+extern tDataCenter gDataCenter;
+
+
+//Layer settings,
+int IsLayerVisible(std::wstring sLayer);

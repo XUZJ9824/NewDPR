@@ -134,12 +134,12 @@ public: CPolylineEntity();
 		~CPolylineEntity();
 
 		void AddSegment(CLineGeometry *pSegment);
-		std::vector<CLineGeometry*> m_lstLines;
+		std::vector<CLineGeometry*> m_lstLineGeometries;
 
 		virtual inline int PointsCount()
 		{
 			int cnt = 0;
-			for (std::vector<CLineGeometry*>::const_iterator it = m_lstLines.begin(); it != m_lstLines.end(); it++)
+			for (std::vector<CLineGeometry*>::const_iterator it = m_lstLineGeometries.begin(); it != m_lstLineGeometries.end(); it++)
 			{
 				cnt += (*it)->PointsCount();
 			}
@@ -232,7 +232,7 @@ public:
 		return cnt;
 	}
 
-	inline int PointsCountPolyline()
+	inline int TotalPolylinePoints()
 	{
 		int cnt = 0;
 		for (std::vector<CPolylineEntity*>::const_iterator it = m_lstPolyLines.begin(); it != m_lstPolyLines.end(); it++)

@@ -1,4 +1,5 @@
 ﻿//FILE: MapEngine.cpp
+#include "stdafx.h"
 #include "MapEngine.h"
 
 #pragma comment(lib, "d3d9.lib")
@@ -230,7 +231,7 @@ void CMapEngine::DoDraw()
 	HRESULT hr = 0;
 	if(m_pd3dDevice)
 	{
-		//--clear the window to a deep blue 
+		//--clear the window to black 
 		hr = m_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 		hr = m_pd3dDevice->BeginScene(); //--开始通知显卡要进行渲染 
 
@@ -242,8 +243,9 @@ void CMapEngine::DoDraw()
 		//draw each layers
 		for (std::vector<CMapLayer*>::const_iterator it = this->m_lstMayLayers.begin(); it != m_lstMayLayers.end(); it++) 
 		{
-			//TBD: Check is layer visible from IsLayerVisible
-			(*it)->DoDraw();
+			if (IsLayerVisible((*it)->m_strLayerName)) { 
+				(*it)->DoDraw(); 
+			}
 		}
 
 		m_pd3dDevice->EndScene();  //--结束图形的渲染 
@@ -470,6 +472,7 @@ bool CMapEngine::ParseDwgToLayers()
 	for (std::vector<CMapLayer*>::const_iterator it = this->m_lstMayLayers.begin(); it != this->m_lstMayLayers.end(); it++) 
 	{
 		(*it)->InitLineStripsBuffer();
+		(*it)->InitPolyLineBuffer();
 		(*it)->InitPolygonBuffer();
 	}
 	return rt;

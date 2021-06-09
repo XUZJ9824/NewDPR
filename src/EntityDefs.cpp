@@ -124,7 +124,7 @@ CPolylineEntity::~CPolylineEntity()
 };
 void CPolylineEntity::AddSegment(CLineGeometry *pSegment)
 {
-	m_lstLines.push_back(pSegment);
+	m_lstLineGeometries.push_back(pSegment);
 }
 
 CTextEntity::CTextEntity()	
@@ -184,11 +184,11 @@ bool CAirportMapEntities::AddEntity(CEntity *pEntity)
 			break;
 
 		case ePolylineEntity: 
-			this->m_lstPolygons.push_back((CPolygonEntity*) pEntity);
+			this->m_lstPolyLines.push_back((CPolylineEntity*)pEntity);			
 			break;
 
 		case ePolygonEntity: 
-			this->m_lstPolyLines.push_back((CPolylineEntity*)pEntity);
+			this->m_lstPolygons.push_back((CPolygonEntity*)pEntity);
 			break;
 
 		case eTextEntity: 
@@ -240,7 +240,7 @@ void CPointAlteration::Alterate(CPointF *ptSrc, CPointF *ptDst)
 	outputPoint.Y -= m_Center.Y;
 
 	//save x temporarily because we need the original X to calculate Y aswell
-	float tmpx = cos(m_Angle) * outputPoint.X + -sin(m_Angle) * outputPoint.Y;
+	double tmpx = cos(m_Angle) * outputPoint.X + -sin(m_Angle) * outputPoint.Y;
 	outputPoint.Y = sin(m_Angle) * outputPoint.X + cos(m_Angle) * outputPoint.Y;
 	outputPoint.X = tmpx;
 

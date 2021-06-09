@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 //FILE: MapLayer.h
 #include "commonDefs.h"
@@ -54,9 +54,14 @@ public:
 
 	bool InitD3DDevices();
 
-	bool InitPolygonBuffer();
-	
+	/*分散线段*/
 	bool InitLineStripsBuffer();
+	
+	/*连接线段*/
+	bool InitPolyLineBuffer();
+	
+	/*多点折现区域*/
+	bool InitPolygonBuffer();
 
 	void DoDraw();
 
@@ -75,18 +80,11 @@ protected:
 	LPDIRECT3DVERTEXBUFFER9         m_LineStripsPosBuffer;
 	bool                            m_LineStripsBuffersInitialized;
 
-	//LPDIRECT3DVERTEXBUFFER9         m_pGeometryColorVertexBuffer;
-	//IDirect3DIndexBuffer9*          m_pGeometryIndexVertexBuffer;
-	LPDIRECT3DVERTEXDECLARATION9    m_pVertexDeclaration;
-	int                             m_MaxIndex;
-	int                             m_SegmentCount;	
+	UINT                            m_PolyLinePosBufferSize;
+	LPDIRECT3DVERTEXBUFFER9         m_PolyLinePosBuffer;
+	bool                            m_PolyLinePosBufferInitialized;
 
 	UINT                            m_PolygonPosBufferSize;
 	LPDIRECT3DVERTEXBUFFER9         m_PolygonPosBuffer;
 	bool					        m_PolygonPosBufferInitialized;
-	
-	int                             m_PolygonVerticesCount;
-	int                             m_TrianglesCount;
-	int                             m_PolygonMaxIndex;
-	bool                            m_PolygonBuffersInitialized;
 };

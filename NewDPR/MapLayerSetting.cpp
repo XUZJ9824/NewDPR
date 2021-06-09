@@ -5,7 +5,7 @@
 #include "NewDPR.h"
 #include "MapLayerSetting.h"
 #include "afxdialogex.h"
-
+#include "commonDefs.h"
 
 // CMapLayerSetting dialog
 
@@ -36,22 +36,38 @@ END_MESSAGE_MAP()
 void CMapLayerSetting::OnRangeButtonClick(UINT nID)
 {
 	int iChkStatus = ((CButton*)GetDlgItem(nID))->GetCheck();
+	unsigned int index = nID - IDC_chkLayerStart;
+
+	if (index < gDataCenter.arrDwgLayers.size())
+	{
+		gDataCenter.arrDwgLayers[index].bVisible = iChkStatus;
+	}
+	else 
+	{
+		ASSERT(0);
+	}
+
 	//SendMessageToViews(GetParent()->GetSafeHwnd(), WM_COMMAND, MAKEWPARAM(nID, iChkStatus), cmdLayers);
 }
 
 void CMapLayerSetting::SetDwgLayers(std::list<DRW_Layer> * pLayers)
 {
-	this->m_arrLayers.clear();
+	gDataCenter.arrDwgLayers.clear();
+	
 	for (std::list<DRW_Layer>::const_iterator it = pLayers->begin(); it != pLayers->end(); it++) {
+		tDwgLayer tempLayer;
 		std::wstring stemp((*it).name.begin(), (*it).name.end());
-		m_arrLayers.push_back(stemp);
+		tempLayer.sLayer = stemp;
+		tempLayer.bVisible = 1;
+
+		gDataCenter.arrDwgLayers.push_back(tempLayer);
 	}
 	UpdateLayerOptions();
 }
 
 void CMapLayerSetting::UpdateLayerOptions() {
 
-	if (m_arrLayers.size() > 0)
+	if (gDataCenter.arrDwgLayers.size() > 0)
 	{
 		//clear existed checkbox if already have
 		DestroyLayerChecks();
@@ -62,9 +78,9 @@ void CMapLayerSetting::UpdateLayerOptions() {
 		int height = 20;
 		int width = 250;
 		CRect recCurr(cx_start, cy_start, cx_start + width, cy_start + height);
-		for (int i = 0; i < m_arrLayers.size() && (i < MAX_LAYERS); i++)
+		for (int i = 0; i < gDataCenter.arrDwgLayers.size() && (i < MAX_LAYERS); i++)
 		{
-			strLayer = m_arrLayers[i];
+			strLayer = gDataCenter.arrDwgLayers[i].sLayer;
 
 			CButton *pNewButton = new CButton();
 			CString tmp(strLayer.c_str());
@@ -73,7 +89,7 @@ void CMapLayerSetting::UpdateLayerOptions() {
 				recCurr,
 				this,
 				IDC_chkLayerStart + i);
-			pNewButton->SetCheck(1);
+			pNewButton->SetCheck(gDataCenter.arrDwgLayers[i].bVisible);
 			pNewButton->ShowWindow(SW_NORMAL);
 			m_arrChkBoxes.push_back(pNewButton);
 
@@ -119,20 +135,4 @@ void CMapLayerSetting::DestroyLayerChecks()
 	}
 }
 
-int CMapLayerSetting::IsLayerVisible(std::wstring sLayer)
-{
-	int i = -1;
-	int rt = 0;
-	for (std::vector<std::wstring>::const_iterator it = m_arrLayers.begin(); it != m_arrLayers.end(); it++) 
-	{
-		i++;
-		if (*it == sLayer) break;
-	}
 
-	if (i >= 0) 
-	{
-		rt = m_arrChkBoxes[i]->GetCheck();
-	}
-
-	return rt;
-}

@@ -45,7 +45,6 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 
-	std::vector<std::wstring> m_arrLayers;
 	std::vector<CButton*>     m_arrChkBoxes;
 
 	void UpdateLayerOptions();
@@ -53,5 +52,4 @@ protected:
 	
 public:
 	virtual BOOL OnInitDialog();
-	int IsLayerVisible(std::wstring sLayer);
 };

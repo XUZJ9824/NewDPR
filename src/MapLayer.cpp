@@ -29,7 +29,8 @@ CMapLayer::CMapLayer(CMapEngine *pEngine, std::wstring strLayerName)
 {
 	m_bInitialed = false;
 	m_LineStripsBuffersInitialized = false;
-	m_PolygonBuffersInitialized = false;
+	m_PolyLinePosBufferInitialized = false;
+	m_PolygonPosBufferInitialized = false;
 	m_bAlreadyGetInfo = false;
 
 	this->m_strLayerName = strLayerName;
@@ -56,9 +57,8 @@ CMapLayer::CMapLayer(CMapEngine *pEngine, std::wstring strLayerName)
 CMapLayer::~CMapLayer() 
 {
 	SAFE_RELEASE(m_LineStripsPosBuffer);
+	SAFE_RELEASE(m_PolyLinePosBuffer);
 	SAFE_RELEASE(m_PolygonPosBuffer);
-
-	int ii = 0;
 }
 
 void CMapLayer::GetLayerInfo(std::list<DRW_Layer> *players)
@@ -82,12 +82,72 @@ void CMapLayer::GetLayerInfo(std::list<DRW_Layer> *players)
 	
 }
 
+bool CMapLayer::InitPolyLineBuffer()
+{
+	int itemPoints;
+	int pointsCount = this->m_Entities.TotalPolylinePoints();
+
+	if (m_pd3dDevice && (pointsCount>0))
+	{
+		// Release old buffers if needed
+		SAFE_RELEASE(m_PolyLinePosBuffer);
+
+		m_PolyLinePosBufferSize = pointsCount * sizeof(Vertex);
+
+		//Create Vertex Buffer
+		if (FAILED(m_pd3dDevice->CreateVertexBuffer(m_PolyLinePosBufferSize,
+			D3DUSAGE_WRITEONLY,
+			CUSTOMVERTEX,
+			D3DPOOL_DEFAULT,
+			&m_PolyLinePosBuffer, NULL)))
+		{
+			//_ASSERT(0); TBD
+			return false;
+		}
+
+		// Lock them
+		Vertex*  pInternalPositionVertexBuffer;
+		WORD     index = 0;
+		PWORD    pIndex;
+
+		if (FAILED(m_PolyLinePosBuffer->Lock(0, m_PolyLinePosBufferSize, (void**)&pInternalPositionVertexBuffer, 0)))
+		{
+			_ASSERT(0); //TBD
+			return false;
+		}
+
+		for (std::vector<CPolylineEntity*>::const_iterator it = this->m_Entities.m_lstPolyLines.begin(); it != m_Entities.m_lstPolyLines.end(); it++)
+		{
+			CPolylineEntity* pPolyLine = *it; //std::vector<CLineGeometry*> m_lstLineGeometries
+			for (std::vector<CLineGeometry*>::const_iterator it2 = pPolyLine->m_lstLineGeometries.begin(); it2 != pPolyLine->m_lstLineGeometries.end(); it2++)
+			{
+				CLineGeometry* pLineGeometry = *it2;
+
+				pInternalPositionVertexBuffer->X = pLineGeometry->m_startPoint.X;
+				pInternalPositionVertexBuffer->Y = pLineGeometry->m_startPoint.Y;
+				pInternalPositionVertexBuffer->dColor = pPolyLine->m_Color;
+				pInternalPositionVertexBuffer++;
+
+				pInternalPositionVertexBuffer->X = pLineGeometry->m_endPoint.X;
+				pInternalPositionVertexBuffer->Y = pLineGeometry->m_endPoint.Y;
+				pInternalPositionVertexBuffer->dColor = pPolyLine->m_Color;
+				pInternalPositionVertexBuffer++;
+			}
+		}
+
+		m_PolyLinePosBuffer->Unlock();
+		m_PolyLinePosBufferInitialized = true;
+	}
+
+	return true;
+}
+
 bool CMapLayer::InitPolygonBuffer()
 {
 	int itemPoints;
 	int pointsCount = this->m_Entities.TotalPolygonPoints();
 
-	if (m_pd3dDevice)
+	if (m_pd3dDevice && (pointsCount>0))
 	{
 		// Release old buffers if needed
 		SAFE_RELEASE(m_PolygonPosBuffer);
@@ -128,11 +188,12 @@ bool CMapLayer::InitPolygonBuffer()
 				pInternalPositionVertexBuffer->dColor = pPolygon->m_Color;
 				pInternalPositionVertexBuffer++;
 			}
-		}
+		}	
+		
+		m_PolygonPosBuffer->Unlock();
+		m_PolygonPosBufferInitialized = true;
 	}
 
-	m_PolygonPosBuffer->Unlock();
-	m_PolygonPosBufferInitialized = true;
 	return true;
 }
 
@@ -142,7 +203,7 @@ bool CMapLayer::InitLineStripsBuffer()
 	int itemPoints;
 	int pointsCount = this->m_Entities.TotalLinePoints();
 
-	if (m_pd3dDevice)
+	if (m_pd3dDevice && (pointsCount>0))
 	{
 		// Release old buffers if needed
 		SAFE_RELEASE(m_LineStripsPosBuffer);
@@ -180,19 +241,20 @@ bool CMapLayer::InitLineStripsBuffer()
 
 				pInternalPositionVertexBuffer->X = pLineGeometry->m_startPoint.X;
 				pInternalPositionVertexBuffer->Y = pLineGeometry->m_startPoint.Y;
-				pInternalPositionVertexBuffer->dColor = pLine->m_Color;
+				pInternalPositionVertexBuffer->dColor = D3DCOLOR_XRGB(255,0,0);; //TBD
 				pInternalPositionVertexBuffer++;
 
 				pInternalPositionVertexBuffer->X = pLineGeometry->m_endPoint.X;
 				pInternalPositionVertexBuffer->Y = pLineGeometry->m_endPoint.Y;
-				pInternalPositionVertexBuffer->dColor = pLine->m_Color;
+				pInternalPositionVertexBuffer->dColor = D3DCOLOR_XRGB(255,0,0); //TBD
 				pInternalPositionVertexBuffer++;
 			}
 		}		
-	}
 
-	m_LineStripsPosBuffer->Unlock();
-	m_LineStripsBuffersInitialized = true;
+		m_LineStripsPosBuffer->Unlock();
+		m_LineStripsBuffersInitialized = true;
+	}
+	
 	return true;
 }
 
@@ -209,6 +271,19 @@ void CMapLayer::DoDraw()
 		m_pd3dDevice->SetFVF(CUSTOMVERTEX);
 
 		m_pd3dDevice->DrawPrimitive(D3DPT_LINELIST, 0, m_LineStripsPosBufferSize/sizeof(Vertex));
+	}
+
+	//TBD draw Polylines
+	if (m_PolyLinePosBuffer && m_pd3dDevice) {
+		m_pd3dDevice->SetTransform(D3DTS_WORLD, &(m_pEngine->matWorld));
+		m_pd3dDevice->SetTransform(D3DTS_VIEW, &(m_pEngine->matView));
+		m_pd3dDevice->SetTransform(D3DTS_PROJECTION, &(m_pEngine->matProjection));
+
+		m_pd3dDevice->SetTexture(0, NULL);
+		m_pd3dDevice->SetStreamSource(0, m_PolyLinePosBuffer, 0, sizeof(Vertex));
+		m_pd3dDevice->SetFVF(CUSTOMVERTEX);
+
+		m_pd3dDevice->DrawPrimitive(D3DPT_LINESTRIP, 0, m_PolyLinePosBufferSize / sizeof(Vertex));
 	}
 
 	//Draw Polygon
@@ -228,8 +303,7 @@ void CMapLayer::DoDraw()
 
 
 	//TBD draw text 
-
-	//TBD draw Polylines
+	
 }
 
 void CMapLayer::PrintEntities() 

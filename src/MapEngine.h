@@ -30,6 +30,8 @@ public:
 	void SetViewSize(int w, int h);
 	void SetZoomDelta(float zDelta);
 	void SetTransform(int x, int y);
+
+	std::list<DRW_Layer> * GetDwgLayers() {	return &(m_dxData.layers); };
 protected:
 	//Raw Image Data here
 	dx_data     m_dxData;

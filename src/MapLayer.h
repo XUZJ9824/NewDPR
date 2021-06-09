@@ -82,7 +82,7 @@ protected:
 	int                             m_SegmentCount;	
 
 	UINT                            m_PolygonPosBufferSize;
-	LPDIRECT3DVERTEXBUFFER9         m_pPolygonPosBuffer;
+	LPDIRECT3DVERTEXBUFFER9         m_PolygonPosBuffer;
 	bool					        m_PolygonPosBufferInitialized;
 	
 	int                             m_PolygonVerticesCount;

@@ -219,9 +219,6 @@ bool CMapEngine::loadDwgMap(std::string strImagePath)
 		ClearMapLayers();
 		ParseDwgToLayers();
 	}
-	else {
-		_ASSERT(0); 
-	}
 
 	delete pDxInput;
 
@@ -245,6 +242,7 @@ void CMapEngine::DoDraw()
 		//draw each layers
 		for (std::vector<CMapLayer*>::const_iterator it = this->m_lstMayLayers.begin(); it != m_lstMayLayers.end(); it++) 
 		{
+			//TBD: Check is layer visible from IsLayerVisible
 			(*it)->DoDraw();
 		}
 
@@ -484,12 +482,12 @@ void  CMapEngine::ExtractDwgEntityData(DRW_Entity *pDwgEntity, CBasicLayer* pLay
 		switch(pDwgEntity->eType){
 		case DRW::LINE: 
 			pNewEntity = DwgLineToLineEntity((DRW_Line *) pDwgEntity, pAlteration);
-			pNewEntity->SetParent(pLayer);
+			if (pNewEntity) pNewEntity->SetParent(pLayer);
 			((CLineEntity*)pNewEntity)->SetDwgColor(((DRW_Line *)pDwgEntity)->color);
 			break;
 		case DRW::LWPOLYLINE: 
 			pNewEntity = DwgPolylineBaseToPolyLine((DRW_LWPolyline *)pDwgEntity, pAlteration);
-			pNewEntity->SetParent(pLayer);
+			if (pNewEntity) pNewEntity->SetParent(pLayer);
 			break;
 		case DRW::MTEXT: //CADTextToTextEntity
 			break;
@@ -499,7 +497,7 @@ void  CMapEngine::ExtractDwgEntityData(DRW_Entity *pDwgEntity, CBasicLayer* pLay
 			break;
 		case DRW::ARC: //DwgPolylineBaseToPolyLine
 			pNewEntity = DwgPolylineBaseToPolyLine((DRW_Arc *)pDwgEntity, pAlteration);
-			pNewEntity->SetParent(pLayer);
+			if(pNewEntity) pNewEntity->SetParent(pLayer);
 			break;
 		case DRW::HATCH: //ExtractDataFromCadInsert
 			break;

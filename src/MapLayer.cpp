@@ -56,7 +56,7 @@ CMapLayer::CMapLayer(CMapEngine *pEngine, std::wstring strLayerName)
 CMapLayer::~CMapLayer() 
 {
 	SAFE_RELEASE(m_LineStripsPosBuffer);
-	SAFE_RELEASE(m_pPolygonPosBuffer);
+	SAFE_RELEASE(m_PolygonPosBuffer);
 
 	int ii = 0;
 }
@@ -90,7 +90,7 @@ bool CMapLayer::InitPolygonBuffer()
 	if (m_pd3dDevice)
 	{
 		// Release old buffers if needed
-		SAFE_RELEASE(m_pPolygonPosBuffer);
+		SAFE_RELEASE(m_PolygonPosBuffer);
 
 		m_PolygonPosBufferSize = pointsCount * sizeof(Vertex);
 
@@ -99,7 +99,7 @@ bool CMapLayer::InitPolygonBuffer()
 			D3DUSAGE_WRITEONLY,
 			CUSTOMVERTEX,
 			D3DPOOL_DEFAULT,
-			&m_pPolygonPosBuffer, NULL)))
+			&m_PolygonPosBuffer, NULL)))
 		{
 			//_ASSERT(0); TBD
 			return false;
@@ -110,33 +110,28 @@ bool CMapLayer::InitPolygonBuffer()
 		WORD     index = 0;
 		PWORD    pIndex;
 
-		if (FAILED(m_pPolygonPosBuffer->Lock(0, m_PolygonPosBufferSize, (void**)&pInternalPositionVertexBuffer, 0)))
+		if (FAILED(m_PolygonPosBuffer->Lock(0, m_PolygonPosBufferSize, (void**)&pInternalPositionVertexBuffer, 0)))
 		{
 			_ASSERT(0); //TBD
 			return false;
 		}
 
-		/*for (std::vector<CLineEntity*>::const_iterator it = this->m_Entities.m_lstLines.begin(); it != m_Entities.m_lstLines.end(); it++)
+		for (std::vector<CPolygonEntity*>::const_iterator it = this->m_Entities.m_lstPolygons.begin(); it != m_Entities.m_lstPolygons.end(); it++)
 		{
-			CLineEntity* pLine = *it;
-			for (std::vector<CLineGeometry*>::const_iterator it2 = pLine->m_lstLineGeometries.begin(); it2 != pLine->m_lstLineGeometries.end(); it2++)
+			CPolygonEntity* pPolygon = *it;
+			for (std::vector<CPointF*>::const_iterator it2 = pPolygon->m_lstVertices.begin(); it2 != pPolygon->m_lstVertices.end(); it2++)
 			{
-				CLineGeometry* pLineGeometry = *it2;
+				CPointF* pPoint = *it2;
 
-				pInternalPositionVertexBuffer->X = pLineGeometry->m_startPoint.X;
-				pInternalPositionVertexBuffer->Y = pLineGeometry->m_startPoint.Y;
-				pInternalPositionVertexBuffer->dColor = pLine->m_Color;
-				pInternalPositionVertexBuffer++;
-
-				pInternalPositionVertexBuffer->X = pLineGeometry->m_endPoint.X;
-				pInternalPositionVertexBuffer->Y = pLineGeometry->m_endPoint.Y;
-				pInternalPositionVertexBuffer->dColor = pLine->m_Color;
+				pInternalPositionVertexBuffer->X = pPoint->X;
+				pInternalPositionVertexBuffer->Y = pPoint->Y;
+				pInternalPositionVertexBuffer->dColor = pPolygon->m_Color;
 				pInternalPositionVertexBuffer++;
 			}
-		}*/
+		}
 	}
 
-	m_pPolygonPosBuffer->Unlock();
+	m_PolygonPosBuffer->Unlock();
 	m_PolygonPosBufferInitialized = true;
 	return true;
 }
@@ -203,7 +198,7 @@ bool CMapLayer::InitLineStripsBuffer()
 
 void CMapLayer::DoDraw() 
 {
-	//TBD draw Line strips here
+	//draw Line strips here
 	if (m_LineStripsPosBuffer && m_pd3dDevice) {
 		m_pd3dDevice->SetTransform(D3DTS_WORLD, &(m_pEngine->matWorld));
 		m_pd3dDevice->SetTransform(D3DTS_VIEW, &(m_pEngine->matView));
@@ -215,6 +210,26 @@ void CMapLayer::DoDraw()
 
 		m_pd3dDevice->DrawPrimitive(D3DPT_LINELIST, 0, m_LineStripsPosBufferSize/sizeof(Vertex));
 	}
+
+	//Draw Polygon
+	if (m_PolygonPosBuffer && m_pd3dDevice) 
+	{
+		m_pd3dDevice->SetTransform(D3DTS_WORLD, &(m_pEngine->matWorld));
+		m_pd3dDevice->SetTransform(D3DTS_VIEW, &(m_pEngine->matView));
+		m_pd3dDevice->SetTransform(D3DTS_PROJECTION, &(m_pEngine->matProjection));
+
+		m_pd3dDevice->SetTexture(0, NULL);
+		m_pd3dDevice->SetStreamSource(0, m_PolygonPosBuffer, 0, sizeof(Vertex));
+		m_pd3dDevice->SetFVF(CUSTOMVERTEX);
+
+		//TBD: try the D3DPT_TRIANGLELIST as HMI
+		m_pd3dDevice->DrawPrimitive(D3DPT_LINESTRIP, 0, m_PolygonPosBufferSize / sizeof(Vertex));
+	}
+
+
+	//TBD draw text 
+
+	//TBD draw Polylines
 }
 
 void CMapLayer::PrintEntities() 

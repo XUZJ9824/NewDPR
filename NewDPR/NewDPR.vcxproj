@@ -198,6 +198,7 @@
     <ClInclude Include="ClassView.h" />
     <ClInclude Include="FileView.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="MapLayerSetting.h" />
     <ClInclude Include="NewDPR.h" />
     <ClInclude Include="NewDPRDoc.h" />
     <ClInclude Include="NewDPRView.h" />
@@ -228,6 +229,7 @@
     <ClCompile Include="ClassView.cpp" />
     <ClCompile Include="FileView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="MapLayerSetting.cpp" />
     <ClCompile Include="NewDPR.cpp" />
     <ClCompile Include="NewDPRDoc.cpp" />
     <ClCompile Include="NewDPRView.cpp" />
@@ -278,4 +280,9 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="NewDPR.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

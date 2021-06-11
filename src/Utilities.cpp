@@ -30,6 +30,15 @@ int Print_Debug(const TCHAR *sfmt, ...)
 	return Print(stemp);
 }
 
+int Print_Error(const TCHAR* str) 
+{
+	int rt = 0;
+	static TCHAR stemp[1024] = { 0 };
+
+	swprintf_s(stemp, 1024, _T("ERR:%s\r\n"), str);
+	return Print(stemp);
+}
+
 void GetColorByIndex(unsigned int iDwgColor, unsigned short &R, unsigned short &G, unsigned short &B) 
 {
 	static unsigned short acad_colors_static[256 + 1][3] =

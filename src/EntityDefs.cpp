@@ -24,7 +24,7 @@ CEntity::~CEntity() {};
 
 CLineGeometry::CLineGeometry() 
 {
-	Print_Debug(_T("New CLineGeometry"));
+	Print_Debug(_T("New CLineGeometry\r\n"));
 }
 CLineGeometry::CLineGeometry(CPointF stPt, CPointF endPt)
 {
@@ -45,7 +45,7 @@ CLineGeometry::~CLineGeometry()
 CLineEntity::CLineEntity()	
 {
 	m_Type = eLineEntity;
-	Print_Debug(_T("New CLineEntity"));
+	Print_Debug(_T("New CLineEntity\r\n"));
 };
 
 CLineEntity::~CLineEntity() 
@@ -59,7 +59,9 @@ CLineEntity::~CLineEntity()
 	}
 	m_lstLineGeometries.clear();
 };
-void CLineEntity::SetDwgColor(int iDwgColor)
+
+//Ref to HMI code GetColorCode
+void CEntity::SetDwgColor(int iDwgColor, DRW_Block* pDwgBlk)
 {
 	unsigned short r = 255, g = 255, b = 255;
 	if (m_pParentLayer) 
@@ -73,8 +75,15 @@ void CLineEntity::SetDwgColor(int iDwgColor)
 			}
 			else 
 			{
-				//TBD: find color from block
-				this->m_Color = D3DCOLOR_XRGB(255,255,255);
+				if(pDwgBlk && (pDwgBlk->color!=0) && (pDwgBlk->color != 256))
+				{
+					GetColorByIndex(pDwgBlk->color, r, g, b);
+				}
+				else 
+				{
+					this->m_Color = D3DCOLOR_XRGB(255, 255, 255);
+				}
+				
 			}
 		}
 		else 
@@ -88,7 +97,7 @@ void CLineEntity::SetDwgColor(int iDwgColor)
 
 CPolygonEntity::CPolygonEntity()	
 {
-	Print_Debug(_T("New CPolygonEntity"));
+	Print_Debug(_T("New CPolygonEntity\r\n"));
 	m_Type = ePolygonEntity;
 }
 
@@ -106,7 +115,7 @@ CPolygonEntity::~CPolygonEntity()
 
 CPolylineEntity::CPolylineEntity()	
 {
-	Print_Debug(_T("New CPolylineEntity"));
+	Print_Debug(_T("New CPolylineEntity\r\n"));
 	m_Type = ePolylineEntity;
 };
 CPolylineEntity::~CPolylineEntity() 
@@ -129,7 +138,7 @@ void CPolylineEntity::AddSegment(CLineGeometry *pSegment)
 
 CTextEntity::CTextEntity()	
 {
-	Print_Debug(_T("New CTextEntity"));
+	Print_Debug(_T("New CTextEntity\r\n"));
 	m_Type = eTextEntity;
 };
 CTextEntity::~CTextEntity()

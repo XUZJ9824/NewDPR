@@ -73,7 +73,7 @@ HRESULT CMapEngine::EnsureD3DObjects()
 		if (!D3DXCheckVersion(D3D_SDK_VERSION, D3DX_SDK_VERSION))
 		{
 			hr = E_FAIL;
-			LOGGER_ERROR(_T("Wrong directX version !"));
+			Print_Error(_T("Wrong directX version !"));
 		}
 		else {
 			HMODULE hD3D = LoadLibrary(TEXT("d3d9.dll"));
@@ -85,13 +85,13 @@ HRESULT CMapEngine::EnsureD3DObjects()
 					hr = pfnCreate9Ex(D3D_SDK_VERSION, &m_pD3DEx);
 					if (FAILED(hr))
 					{
-						LOGGER_ERROR(_T("Unable to retrieve Direct3DCreate9Ex address !"));
+						Print_Error(_T("Unable to retrieve Direct3DCreate9Ex address !"));
 					}
 					else {
 						hr = m_pD3DEx->QueryInterface(__uuidof(IDirect3D9), reinterpret_cast<void**>(&m_pD3D));
 						if (FAILED(hr))
 						{
-							LOGGER_ERROR(_T("Unable to get IDirect3D9 interface with QueryInterface.\n"));
+							Print_Error(_T("Unable to get IDirect3D9 interface with QueryInterface.\n"));
 						}
 					}
 				}
@@ -101,14 +101,14 @@ HRESULT CMapEngine::EnsureD3DObjects()
 					if (m_pD3D == NULL)
 					{
 						hr = E_FAIL;
-						LOGGER_ERROR(_T("Direct3DCreate9 failed !"));
+						Print_Error(_T("Direct3DCreate9 failed !"));
 					}
 				}
 			}
 			else
 			{
 				hr = E_FAIL;
-				LOGGER_ERROR(_T("Loading Library d3d9.dll failed !"));
+				Print_Error(_T("Loading Library d3d9.dll failed !"));
 			}
 			
 			if (hD3D != NULL)
@@ -265,11 +265,11 @@ void CMapEngine::SetZoomDelta(float zDelta)
 {
 	m_scale += zDelta;
 
-	if (m_scale < 0.05)
+	if (m_scale < 0.01)
 	{
-		m_scale = 0.05;
+		m_scale = 0.01;
 	}
-	else if (m_scale > 30.0)
+	else if (m_scale > 100.0)
 	{
 		m_scale = 30;
 	}
@@ -471,7 +471,7 @@ bool CMapEngine::ParseDwgToLayers()
 	//dwg entities to D3D vertex for rendering purpose
 	for (std::vector<CMapLayer*>::const_iterator it = this->m_lstMayLayers.begin(); it != this->m_lstMayLayers.end(); it++) 
 	{
-		(*it)->InitLineStripsBuffer();
+		(*it)->InitLineListsBuffer();
 		(*it)->InitPolyLineBuffer();
 		(*it)->InitPolygonBuffer();
 	}
@@ -486,11 +486,12 @@ void  CMapEngine::ExtractDwgEntityData(DRW_Entity *pDwgEntity, CBasicLayer* pLay
 		case DRW::LINE: 
 			pNewEntity = DwgLineToLineEntity((DRW_Line *) pDwgEntity, pAlteration);
 			if (pNewEntity) pNewEntity->SetParent(pLayer);
-			((CLineEntity*)pNewEntity)->SetDwgColor(((DRW_Line *)pDwgEntity)->color);
+			pNewEntity->SetDwgColor(((DRW_Line *)pDwgEntity)->color, pDwgBlk);
 			break;
 		case DRW::LWPOLYLINE: 
 			pNewEntity = DwgPolylineBaseToPolyLine((DRW_LWPolyline *)pDwgEntity, pAlteration);
 			if (pNewEntity) pNewEntity->SetParent(pLayer);
+			pNewEntity->SetDwgColor(((DRW_LWPolyline *)pDwgEntity)->color, pDwgBlk);
 			break;
 		case DRW::MTEXT: //CADTextToTextEntity
 			break;
@@ -519,8 +520,10 @@ void  CMapEngine::ExtractDwgEntityData(DRW_Entity *pDwgEntity, CBasicLayer* pLay
 	}
 }
 CEntity* CMapEngine::DwgLineToLineEntity(DRW_Line *pDwgLine, CPointAlteration *pAlteration) {
+	Print_Debug(_T("DwgLineToLineEntity\r\n"));
+
 	CLineEntity *pLine = new CLineEntity();
-	CLineGeometry *pLineGeometry = new CLineGeometry();
+	
 
 	CPointF ptStart(pDwgLine->basePoint.x, pDwgLine->basePoint.y);
 	CPointF ptEnd(pDwgLine->secPoint.x, pDwgLine->secPoint.y);
@@ -528,20 +531,22 @@ CEntity* CMapEngine::DwgLineToLineEntity(DRW_Line *pDwgLine, CPointAlteration *p
 
 	GetArpRelativeCoordinates(&ptStart, &ptNewStart, pAlteration);
 	GetArpRelativeCoordinates(&ptEnd, &ptNewEnd, pAlteration);
-	
-	pLineGeometry->m_startPoint = ptNewStart;
-	pLineGeometry->m_endPoint = ptNewEnd;
+
+	CLineGeometry *pLineGeometry = new CLineGeometry(ptNewStart, ptNewEnd);
+	//pLineGeometry->m_startPoint = ptNewStart;
+	//pLineGeometry->m_endPoint = ptNewEnd;
 
 	pLine->m_lstLineGeometries.push_back(pLineGeometry);
 	return pLine;
 };
 CEntity* CMapEngine::DwgPolylineBaseToPolyLine(DRW_LWPolyline * pDwgEntity, CPointAlteration *pAlteration)
 {	
+	Print_Debug(_T("DwgPolylineBaseToPolyLine\r\n"));
 	int iNumPt = pDwgEntity->vertlist.size();
 	CPolylineEntity *pPolylineEntity = NULL;
 	if (iNumPt >= 2) 
 	{
-		pPolylineEntity = new CPolylineEntity();				
+		pPolylineEntity = new CPolylineEntity();	
 		for (int i = 0; i < (iNumPt-1); i++) 
 		{
 			CPointF pointOne(pDwgEntity->vertlist[i]->x, pDwgEntity->vertlist[i]->y);
@@ -587,6 +592,7 @@ CEntity* CMapEngine::DwgPolylineBaseToPolyLine(DRW_LWPolyline * pDwgEntity, CPoi
 }
 CEntity* CMapEngine::DwgPolylineBaseToPolyLine(DRW_Arc * pDwgEntity, CPointAlteration *pAlteration)
 {
+	Print_Debug(_T("DwgPolylineBaseToPolyLine\r\n"));
 	CEntity* pEntity = NULL;
 
 	return pEntity;

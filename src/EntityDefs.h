@@ -2,6 +2,7 @@
 
 //FILE: EntityDefs.h
 #include "commonDefs.h"
+#include "dx_data.h"
 
 #include <vector>
 
@@ -77,6 +78,8 @@ public:
 		m_pParentLayer = pParentLayer;  
 	}
 
+	void SetDwgColor(int iDwgColor, DRW_Block* pDwgBlk);
+
 	void SetColor(D3DCOLOR color) { m_Color = color; }
 	virtual inline int PointsCount() { return 0; }
 };
@@ -109,9 +112,7 @@ class CLineEntity : public CEntity
 public: CLineEntity();
 		~CLineEntity();
 
-		std::vector<CLineGeometry*> m_lstLineGeometries;
-
-		void SetDwgColor(int iDwgColor);
+		std::vector<CLineGeometry*> m_lstLineGeometries;		
 
 		virtual inline int PointsCount() 
 		{

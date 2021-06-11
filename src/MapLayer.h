@@ -1,35 +1,7 @@
 ﻿#pragma once
 
 //FILE: MapLayer.h
-#include "commonDefs.h"
-#include "EntityDefs.h"
-#include "dx_data.h"
-
-#include "DxErr.h"
-#include <vector>
-#include <list>
-#include <map>
-
-class CMapEngine;
-
-/*basic common Layer*/
-class CBasicLayer 
-{
-public:
-	CBasicLayer() {};
-	~CBasicLayer() {};
-
-	enum DRW_LW_Conv::lineWidth       lWeight;
-	int                               color; /*!< layer color, code 62 , default BYLAYER (256)*/
-};
-
-/*Layer used for drawing layers*/
-class CDrawLayer : public CBasicLayer
-{
-public:
-	CDrawLayer() {};
-	~CDrawLayer() {};
-};
+#include "BasicLayer.h"
 
 /*Layer used for dwg loaded Map*/
 class CMapLayer : public CBasicLayer
@@ -55,7 +27,7 @@ public:
 	bool InitD3DDevices();
 
 	/*分散线段*/
-	bool InitLineStripsBuffer();
+	bool InitLineListsBuffer();
 	
 	/*连接线段*/
 	bool InitPolyLineBuffer();
@@ -76,8 +48,8 @@ protected:
 	IDirect3DDevice9Ex  *m_pd3dDeviceEx;
 
 	//drawing Element buffer
-	UINT                            m_LineStripsPosBufferSize;
-	LPDIRECT3DVERTEXBUFFER9         m_LineStripsPosBuffer;
+	UINT                            m_LineListPosBufferSize;
+	LPDIRECT3DVERTEXBUFFER9         m_LineListPosBuffer;
 	bool                            m_LineStripsBuffersInitialized;
 
 	UINT                            m_PolyLinePosBufferSize;

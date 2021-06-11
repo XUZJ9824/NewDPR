@@ -196,6 +196,7 @@
     <ClInclude Include="..\src\MapLayer.h" />
     <ClInclude Include="..\src\vsstream.h" />
     <ClInclude Include="ClassView.h" />
+    <ClInclude Include="DrawingLayer.h" />
     <ClInclude Include="FileView.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MapLayerSetting.h" />
@@ -227,6 +228,7 @@
     </ClCompile>
     <ClCompile Include="..\src\vsstream.cpp" />
     <ClCompile Include="ClassView.cpp" />
+    <ClCompile Include="DrawingLayer.cpp" />
     <ClCompile Include="FileView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="MapLayerSetting.cpp" />

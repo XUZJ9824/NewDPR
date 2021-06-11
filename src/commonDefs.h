@@ -55,13 +55,11 @@ struct Vertex
 //Debug Trace Utilities
 #ifdef UNICODE
 int Print_Debug(const TCHAR* sfmt, ...);
+int Print_Error(const TCHAR* str);
 int Print(const TCHAR *str);
 #else
 //TBD
 #endif // !UNICODE
-
-#define LOGGER_INFO(x)  Print(x)
-#define LOGGER_ERROR(x) Print(x)
 
 //Color Mapping 
 void GetColorByIndex(unsigned int iDwgColor, unsigned short &R, unsigned short &G, unsigned short &B);

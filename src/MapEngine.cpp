@@ -42,6 +42,8 @@ CMapEngine::~CMapEngine() {
 	ClearMapLayers();
 
 	SAFE_RELEASE(m_pVertexBuffer);
+
+	DestroyResources();
 };
 void CMapEngine::DestroyResources() 
 {
@@ -127,17 +129,18 @@ HRESULT CMapEngine::EnsureD3DDevices()
 	D3DPRESENT_PARAMETERS d3dpp;
 	ZeroMemory(&d3dpp, sizeof(d3dpp));
 	d3dpp.Windowed = TRUE;
-	//d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
-	//d3dpp.BackBufferHeight = 1;
-	//d3dpp.BackBufferWidth = 1;
+	d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+	d3dpp.BackBufferCount = 1;
+	d3dpp.BackBufferHeight = 0;
+	d3dpp.BackBufferWidth = 0;
 	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 	//d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 	d3dpp.hDeviceWindow = m_hwnd;
 
 	// D3DMULTISAMPLE_2_SAMPLES only with DirectX9Ex interface
 	// d3dpp.MultiSampleType = D3DMULTISAMPLE_2_SAMPLES;
-	// d3dpp.EnableAutoDepthStencil = TRUE;
-	// d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
+	d3dpp.EnableAutoDepthStencil = TRUE;
+	d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
 
 	DWORD dwVertexProcessing;
 

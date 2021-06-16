@@ -29,6 +29,7 @@ void CMapLayerSetting::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CMapLayerSetting, CDialogEx)
 	ON_COMMAND_RANGE(IDC_chkLayerStart, IDC_chkLayerStart + MAX_LAYERS, &CMapLayerSetting::OnRangeButtonClick)
+	ON_BN_CLICKED(IDOK, &CMapLayerSetting::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 
@@ -138,3 +139,10 @@ void CMapLayerSetting::DestroyLayerChecks()
 }
 
 
+
+
+void CMapLayerSetting::OnBnClickedOk()
+{
+	// TODO: Add your control notification handler code here
+	CDialogEx::OnOK();
+}

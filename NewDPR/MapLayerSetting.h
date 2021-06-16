@@ -31,6 +31,7 @@ public:
 	CMapLayerSetting(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CMapLayerSetting();
 
+	/*set Layer List information from DWG for display setting purpose*/
 	void SetDwgLayers(std::list<DRW_Layer> * pLayers);
 
 // Dialog Data

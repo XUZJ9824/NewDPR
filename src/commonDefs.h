@@ -23,6 +23,7 @@
 #define IFCOOM(x)		{ if ((x) == NULL) { hr = E_OUTOFMEMORY; IFC(hr); } }
 #define SAFE_RELEASE(x)	{ if (x) { x->Release(); x = NULL; } }
 #define DEGTORAD        ((2.0f*D3DX_PI)/360.0f)
+#define Step_Degree_Arc (D3DX_PI / 180) //average one line for 1 Angle
 
 typedef HRESULT(WINAPI *DIRECT3DCREATE9EXFUNCTION)(UINT SDKVersion, IDirect3D9Ex**);
 
@@ -86,3 +87,10 @@ extern tDataCenter gDataCenter;
 
 //Layer settings,
 int IsLayerVisible(std::wstring sLayer);
+
+//String utilities
+inline char Ascii2Hex(const char ch);
+
+std::wstring Ansi2WChar(std::string str);
+
+std::wstring ReplaceWCSWithPattern(const std::wstring &message, const std::wstring &pattern, const std::wstring &replace);

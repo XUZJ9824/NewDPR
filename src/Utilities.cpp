@@ -1,7 +1,9 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "commonDefs.h"
 #include <string>
-#include "stdio.h"
+#include <locale> //converter
+#include <codecvt>
+ #include "stdio.h"
 #include "stdlib.h"
 
 using namespace std;
@@ -324,4 +326,99 @@ int IsLayerVisible(std::wstring sLayer)
 	}
 
 	return rt;
+}
+
+//String Utilities
+//Ignore some markup chars from chinese character, result in libdxfrw loading 
+/*chinese character detection and transition. 
+example: '层' is 0x5c42, output from DWG will be 0xc2 0xa5 0x55 0x2b 0x35 0x43 0x34 0x32
+each chinese character always start with 0xc2 0xa5 0x55 0x2b and follow by four bytes chars
+*/
+std::wstring Ansi2WChar(std::string str)
+{
+#if 1
+	int islen = str.length();
+	LPCSTR pstr = str.c_str();
+
+	if (islen)
+	{
+		int i = 0, j = 0;
+		WCHAR *pwszDst = new WCHAR[islen + 1];
+		for (i = 0, j = 0; i < islen;)
+		{
+			DWORD aword = *((DWORD*)(pstr + i));
+			if (aword == 0x2b55a5c2) //Unicode char if large than 0x7f
+			{
+				//skip the leading character for chinese
+				i += 4;
+
+				//transfer follow on 4 bytes into Hex
+				DWORD b1H = Ascii2Hex(pstr[i]);
+				b1H = b1H << 12;
+				DWORD b1L = Ascii2Hex(pstr[i+1]);
+				b1L = b1L << 8;
+				
+				DWORD b2H = Ascii2Hex(pstr[i+2]);
+				b2H = b2H << 4;
+				DWORD b2L = Ascii2Hex(pstr[i+3]);
+
+				pwszDst[j++] = b1H + b1L + b2H + b2L;
+
+				i += 4;
+			}
+			else
+			{
+				pwszDst[j++] = (WCHAR)(str[i++]);
+			}
+		}
+
+		pwszDst[j] = _T('\0');
+
+		wstring widestr(pwszDst);
+		delete pwszDst;
+
+		return widestr;
+	};
+	return _T("");
+#else
+	std::wstring sExclude = _T("¥U+");
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
+	std::wstring widestr = conv.from_bytes(str);
+	widestr = ReplaceWCSWithPattern(widestr, sExclude, _T(""));
+	
+	return widestr;
+#endif
+}
+
+std::wstring ReplaceWCSWithPattern(const std::wstring &message, const std::wstring &pattern, const std::wstring &replace)
+{
+	std::wstring result = message;
+	std::wstring::size_type pos = 0;
+	std::wstring::size_type offset = 0;
+
+	while ((pos = result.find(pattern, offset)) != std::wstring::npos)
+	{
+		result.replace(result.begin() + pos, result.begin() + pos + pattern.size(), replace);
+		offset = pos + replace.size();
+	}
+
+	return result;
+}
+
+inline char Ascii2Hex(const char ch) 
+{
+	if ((ch >= '0') && (ch <= '9'))
+	{
+		return ch - '0';
+	}
+	else if ((ch >= 'A') && (ch <= 'Z'))
+	{
+		return (0x0A + ch - 'A');
+	}
+	else if ((ch >= 'a') && (ch <= 'z'))
+	{
+		return (0x0A + ch - 'a');
+	}
+	else
+		return 0;
 }

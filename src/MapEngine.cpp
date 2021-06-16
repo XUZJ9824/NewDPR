@@ -239,16 +239,16 @@ void CMapEngine::DoDraw()
 		//--clear the window to black 
 		hr = m_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 		hr = m_pd3dDevice->BeginScene(); //--开始通知显卡要进行渲染 
-
-		DrawLine(m_pd3dDevice, (-m_viewWidth / 2) / m_scale, 0, (m_viewWidth / 2) / m_scale, 0, D3DCOLOR_XRGB(255, 255, 255)); //X-Asile
-		DrawLine(m_pd3dDevice, 0, (-m_viewHeight / 2) / m_scale, 0, (m_viewHeight / 2) / m_scale, D3DCOLOR_XRGB(255, 255, 255)); //Y-Asile   
+#if 1
+		DrawLine(m_pd3dDevice, -10, 0, 10, 0, D3DCOLOR_XRGB(255, 255, 255)); //X-Asile
+		DrawLine(m_pd3dDevice, 0, -10, 0, 10, D3DCOLOR_XRGB(255, 255, 255)); //Y-Asile   
 																																	  //hr = DrawRect(m_pd3dDevice, -5, -5, 10, 10, D3DCOLOR_XRGB(255, 0, 0)); //Center Rect
 		DrawCircle(m_pd3dDevice, 0, 0, 10, 10, D3DCOLOR_XRGB(255, 0, 0));
-
+#endif //0
 		//draw each layers
 		for (std::vector<CMapLayer*>::const_iterator it = this->m_lstMayLayers.begin(); it != m_lstMayLayers.end(); it++) 
 		{
-			if (IsLayerVisible((*it)->m_strLayerName)) { 
+			if (IsLayerVisible((*it)->m_strDisplayName)) {
 				(*it)->DoDraw(); 
 			}
 		}
@@ -423,7 +423,7 @@ void CMapEngine::DrawLine(LPDIRECT3DDEVICE9 pDevice, FLOAT X, FLOAT Y, FLOAT X2,
 }
 
 
-CMapLayer* CMapEngine::FindOrNewMapLayer(std::wstring  strName)
+CMapLayer* CMapEngine::FindOrNewMapLayer(std::string  strName)
 {
 	CMapLayer* pLayer = NULL;
 	for (std::vector<CMapLayer*>::const_iterator it = m_lstMayLayers.begin(); it != m_lstMayLayers.end(); ++it) 
@@ -439,7 +439,10 @@ CMapLayer* CMapEngine::FindOrNewMapLayer(std::wstring  strName)
 	/*create layer if not exit*/
 	if (pLayer == NULL) 
 	{
-		pLayer = new CMapLayer(this, strName);
+		std::wstring strDisp = Ansi2WChar(strName);
+		OutputDebugString(strDisp.c_str());
+
+		pLayer = new CMapLayer(this, strName, strDisp);
 		this->m_lstMayLayers.push_back(pLayer);
 	}
 
@@ -456,6 +459,21 @@ void CMapEngine::ClearMapLayers()
 	m_lstMayLayers.clear();
 }
 
+bool CMapEngine::ParseDwgToLayers(dx_ifaceBlock* pBlockEntities, CBasicLayer* pLayer, CPointAlteration *pAlteration)
+{
+	bool rt = false;
+
+	//load dwg entities
+	for (std::list<DRW_Entity*>::const_iterator it = pBlockEntities->ent.begin(); it != pBlockEntities->ent.end(); ++it)
+	{
+		DRW_Entity *entity = *it;			
+		
+		ExtractDwgEntityData(entity, pLayer, pAlteration, NULL);
+	}
+
+	return rt;
+}
+
 bool CMapEngine::ParseDwgToLayers()
 {
 	bool rt = false;
@@ -463,10 +481,9 @@ bool CMapEngine::ParseDwgToLayers()
 	//load dwg entities
 	for (std::list<DRW_Entity*>::const_iterator it = m_dxData.mBlock->ent.begin(); it != m_dxData.mBlock->ent.end(); ++it)
 	{
-		DRW_Entity *entity = *it;
-		std::wstring strTemp( (entity->layer).begin(), (entity->layer).end());
+		DRW_Entity *entity = *it;	
 
-		CMapLayer *pCurrent = this->FindOrNewMapLayer(strTemp);
+		CMapLayer *pCurrent = this->FindOrNewMapLayer(entity->layer);
 		pCurrent->GetLayerInfo(&(m_dxData.layers));
 		
 		CPointAlteration defaultAlteration;
@@ -482,6 +499,7 @@ bool CMapEngine::ParseDwgToLayers()
 	}
 	return rt;
 }
+
 void  CMapEngine::ExtractDwgEntityData(DRW_Entity *pDwgEntity, CBasicLayer* pLayer, CPointAlteration *pAlteration, DRW_Block* pDwgBlk) {
 	CEntity *pNewEntity = NULL;
 
@@ -490,27 +508,43 @@ void  CMapEngine::ExtractDwgEntityData(DRW_Entity *pDwgEntity, CBasicLayer* pLay
 		switch(pDwgEntity->eType){
 		case DRW::LINE: 
 			pNewEntity = DwgLineToLineEntity((DRW_Line *) pDwgEntity, pAlteration);
-			if (pNewEntity) pNewEntity->SetParent(pLayer);
-			pNewEntity->SetDwgColor(((DRW_Line *)pDwgEntity)->color, pDwgBlk);
+			if (pNewEntity) {
+				pNewEntity->SetParent(pLayer);
+				pNewEntity->SetDwgColor(((DRW_Line *)pDwgEntity)->color, pDwgBlk);
+			}
 			break;
 		case DRW::LWPOLYLINE: 
 			pNewEntity = DwgPolylineBaseToPolyLine((DRW_LWPolyline *)pDwgEntity, pAlteration);
-			if (pNewEntity) pNewEntity->SetParent(pLayer);
-			pNewEntity->SetDwgColor(((DRW_LWPolyline *)pDwgEntity)->color, pDwgBlk);
+			if (pNewEntity) {
+				pNewEntity->SetParent(pLayer);
+				pNewEntity->SetDwgColor(((DRW_LWPolyline *)pDwgEntity)->color, pDwgBlk);
+			}
 			break;
 		case DRW::MTEXT: //CADTextToTextEntity
 			break;
 		case DRW::TEXT: //CADTextToTextEntity
 			break;
-		case DRW::CIRCLE:  //CADCircleToPolygonEntity
+		case DRW::CIRCLE:  //DwgPolylineBaseToPolyLine
+			pNewEntity = DwgPolylineBaseToPolyLine((DRW_Circle *)pDwgEntity, pAlteration);
+			if (pNewEntity) { pNewEntity->SetParent(pLayer); 
+				pNewEntity->SetDwgColor(((DRW_Circle *)pDwgEntity)->color, pDwgBlk);
+			}
 			break;
 		case DRW::ARC: //DwgPolylineBaseToPolyLine
 			pNewEntity = DwgPolylineBaseToPolyLine((DRW_Arc *)pDwgEntity, pAlteration);
-			if(pNewEntity) pNewEntity->SetParent(pLayer);
+			if (pNewEntity) { pNewEntity->SetParent(pLayer); 
+				pNewEntity->SetDwgColor(((DRW_Arc *)pDwgEntity)->color, pDwgBlk);
+			}
 			break;
 		case DRW::HATCH: //ExtractDataFromCadInsert
+			pNewEntity = DwgHatchToPolyLine((DRW_Hatch *)pDwgEntity, pAlteration);
+			if (pNewEntity) pNewEntity->SetParent(pLayer);
 			break;
 		case DRW::INSERT: //ExtractDataFromCadInsert
+			pNewEntity = DwgInsertToPolyLine((DRW_Insert *)pDwgEntity, pAlteration, pLayer);
+			if (pNewEntity) { pNewEntity->SetParent(pLayer); 
+				pNewEntity->SetDwgColor(((DRW_Insert *)pDwgEntity)->color, pDwgBlk);
+			}
 			break;
 		case DRW::VIEWPORT: 
 			break;
@@ -546,7 +580,7 @@ CEntity* CMapEngine::DwgLineToLineEntity(DRW_Line *pDwgLine, CPointAlteration *p
 };
 CEntity* CMapEngine::DwgPolylineBaseToPolyLine(DRW_LWPolyline * pDwgEntity, CPointAlteration *pAlteration)
 {	
-	Print_Debug(_T("DwgPolylineBaseToPolyLine\r\n"));
+	Print_Debug(_T("DwgPolylineBaseToPolyLine LWPolyline\r\n"));
 	int iNumPt = pDwgEntity->vertlist.size();
 	CPolylineEntity *pPolylineEntity = NULL;
 	if (iNumPt >= 2) 
@@ -597,9 +631,148 @@ CEntity* CMapEngine::DwgPolylineBaseToPolyLine(DRW_LWPolyline * pDwgEntity, CPoi
 }
 CEntity* CMapEngine::DwgPolylineBaseToPolyLine(DRW_Arc * pDwgEntity, CPointAlteration *pAlteration)
 {
-	Print_Debug(_T("DwgPolylineBaseToPolyLine\r\n"));
+	Print_Debug(_T("DwgPolylineBaseToPolyLine Arc\r\n"));
 	CEntity* pEntity = NULL;
 
+	bool bNewLineAdded = false;
+
+	if (pDwgEntity) 
+	{
+		if (pDwgEntity->startAngle() > pDwgEntity->endAngle()) 
+		{
+			pDwgEntity->endangle += (D3DX_PI*2);
+		}
+
+		pEntity = new CPolylineEntity();
+
+		double curAngle = pDwgEntity->startAngle();
+		//first point
+		double x1 = pDwgEntity->center().x + pDwgEntity->radious * cos(curAngle);
+		double y1 = pDwgEntity->center().y + pDwgEntity->radious * sin(curAngle);
+
+		//to make sure at least one Line added in case the startAngle and endAngle is very close or even equal each other.
+		for (curAngle = pDwgEntity->startAngle() + Step_Degree_Arc; curAngle <= pDwgEntity->endAngle(); curAngle += Step_Degree_Arc)
+		{
+			//second point
+			double x2 = pDwgEntity->center().x + pDwgEntity->radious * cos(curAngle);
+			double y2 = pDwgEntity->center().y + pDwgEntity->radious * sin(curAngle);
+
+			CPointF pt1(x1, y1);
+			CPointF pt2(x2, y2);
+
+			CPointF pointStart, pointEnd;
+			GetArpRelativeCoordinates(&pt1, &pointStart, pAlteration);
+			GetArpRelativeCoordinates(&pt2, &pointEnd, pAlteration);
+
+			CLineGeometry *pOneLine = new CLineGeometry(pointStart, pointEnd);
+			((CPolylineEntity*)pEntity)->AddSegment(pOneLine);
+
+			//move first point to second point
+			x1 = x2;
+			y1 = y2;
+
+			bNewLineAdded = true;
+		}
+
+		
+		if (!bNewLineAdded) 
+		{
+			//simply add a new cross the radius in case no line added already
+		}
+	}
+
+	return pEntity;
+}
+
+CEntity* CMapEngine::DwgPolylineBaseToPolyLine(DRW_Circle * pDwgEntity, CPointAlteration *pAlteration)
+{
+	Print_Debug(_T("DwgPolylineBaseToPolyLine Circle\r\n"));
+	CEntity* pEntity = NULL;
+
+	if (pDwgEntity)
+	{
+		pEntity = new CPolylineEntity();
+
+		double curAngle = 0;
+		//first point
+		double x1 = pDwgEntity->basePoint.x + pDwgEntity->radious * cos(curAngle);
+		double y1 = pDwgEntity->basePoint.y + pDwgEntity->radious * sin(curAngle);
+		for (curAngle = Step_Degree_Arc; curAngle <= (2*D3DX_PI); curAngle += Step_Degree_Arc)
+		{
+			//second point
+			double x2 = pDwgEntity->basePoint.x + pDwgEntity->radious * cos(curAngle);
+			double y2 = pDwgEntity->basePoint.y + pDwgEntity->radious * sin(curAngle);
+
+			CPointF pt1(x1, y1);
+			CPointF pt2(x2, y2);
+
+			CPointF pointStart, pointEnd;
+			GetArpRelativeCoordinates(&pt1, &pointStart, pAlteration);
+			GetArpRelativeCoordinates(&pt2, &pointEnd, pAlteration);
+
+			CLineGeometry *pOneLine = new CLineGeometry(pointStart, pointEnd);
+			((CPolylineEntity*)pEntity)->AddSegment(pOneLine);
+
+			//move first point to second point
+			x1 = x2;
+			y1 = y2;
+		}
+	}
+
+	return pEntity;
+}
+
+/*
+Hatch: angle, rotation anale for all objects inside the current hatch
+Hatch: scale, scale factor for all objects inside the current hatch
+
+*/
+CEntity* CMapEngine::DwgHatchToPolyLine(DRW_Hatch * pDwgEntity, CPointAlteration *pAlteration)
+{
+	Print_Debug(_T("DwgPolylineBaseToPolyLine Hatch\r\n"));
+	CEntity* pEntity = NULL;
+
+	return pEntity;
+}
+
+/*Insert: (block reference)
+cadInsert.Point -             Reference Point from Image (0,0), used to place the Block in final drawing
+cadInsert.Box.Center -        Block Actual Center Offset from Image, combined with internal scale and rotation, then outside offset;
+cadInsert.Block.Box  -        relative pos from inside the block
+
+from real CAD operation practise, CAD firstly make scale inside block per the scale factor, then apply offset and rotate in parent image.
+
+*Real Example from QD 20190612 dwg
+APRX, APRY:             Image Center:                               (9411, 9091)
+cadInsert.Box.Center:   Block Actual Offset from Image Center:      (9888, 7201)
+cadInsert.Point:        Block Ref Offset from Image Center:         (10182, 9154)
+cadInsert.Block.Box.Center: Block Internal Center:                  (3674, -1814)
+cadInsert.Block.Box.Width: Block width :                            129
+cadInsert.Block.Box.Height: Block height:                           49
+*/
+CEntity* CMapEngine::DwgInsertToPolyLine(DRW_Insert * pDwgEntity, CPointAlteration *pAlteration, CBasicLayer* pLayer)
+{
+	Print_Debug(_T("DwgPolylineBaseToPolyLine Insert\r\n"));
+	CEntity* pEntity = NULL;
+
+	CPointF ptOffset(pDwgEntity->basePoint.x, pDwgEntity->basePoint.y);
+	CPointF ptRotateCenter(pDwgEntity->basePoint.x, pDwgEntity->basePoint.y);
+
+	CPointAlteration TempAleration(ptOffset, pDwgEntity->angle, ptRotateCenter, pDwgEntity->xscale, pDwgEntity->yscale);
+
+	//find block based on insert.name
+	dx_ifaceBlock * pBlockEntities = FindBlock(pDwgEntity->name);
+	if (pBlockEntities) 
+	{
+		ParseDwgToLayers(pBlockEntities, pLayer, &TempAleration);
+	}
+	else 
+	{
+		ASSERT(0);
+	}
+
+	//for each entity inside the Insert
+	//ExtractDwgEntityData(pSubEntity, pLayer, &TempAleration);
 	return pEntity;
 }
 
@@ -610,4 +783,21 @@ void CMapEngine::GetArpRelativeCoordinates(CPointF *ptSrc, CPointF *ptDst, CPoin
 
 	ptDst->X = ptTemp.X - m_ArpX;
 	ptDst->Y = ptTemp.Y - m_ArpY;
+}
+
+dx_ifaceBlock* CMapEngine::FindBlock(std::string strBlock) 
+{
+	dx_ifaceBlock* rt = NULL;
+
+	for (std::list<dx_ifaceBlock*>::const_iterator it = m_dxData.blocks.begin(); it != m_dxData.blocks.end(); it++) 
+	{
+		dx_ifaceBlock* tmpblk = *it;
+		if (tmpblk->name == strBlock) 
+		{
+			rt = tmpblk;
+			break;
+		}
+	}
+
+	return rt;
 }

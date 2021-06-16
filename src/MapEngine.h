@@ -35,10 +35,15 @@ public:
 protected:
 	//Raw Image Data here
 	dx_data     m_dxData;
+	dx_ifaceBlock* FindBlock(std::string strBlock);
+
 	void        ExtractDwgEntityData(DRW_Entity *pDwgEntity, CBasicLayer* pLayer, CPointAlteration *pAlteration, DRW_Block* pDwgBlk = NULL);
 	CEntity*    DwgLineToLineEntity(DRW_Line *pDwgLine, CPointAlteration *pAlteration);
 	CEntity*    DwgPolylineBaseToPolyLine(DRW_LWPolyline * pDwgEntity, CPointAlteration *pAlteration);
 	CEntity*    DwgPolylineBaseToPolyLine(DRW_Arc * pDwgEntity, CPointAlteration *pAlteration);
+	CEntity*    DwgPolylineBaseToPolyLine(DRW_Circle * pDwgEntity, CPointAlteration *pAlteration);
+	CEntity*    DwgHatchToPolyLine(DRW_Hatch * pDwgEntity, CPointAlteration *pAlteration);
+	CEntity*    DwgInsertToPolyLine(DRW_Insert * pDwgEntity, CPointAlteration *pAlteration, CBasicLayer* pLayer);
 	void        GetArpRelativeCoordinates(CPointF *ptSrc, CPointF *ptDst, CPointAlteration *pAlteration);
 
 	//Color Settings
@@ -58,9 +63,10 @@ protected:
 	D3DXMATRIX                      matProjection;     // the projection transform matrix
 
 	//Layers
-	CMapLayer* FindOrNewMapLayer(std::wstring  strName);
+	CMapLayer* FindOrNewMapLayer(std::string  strName);
 	std::vector<CMapLayer*> m_lstMayLayers;
 	bool ParseDwgToLayers();
+	bool ParseDwgToLayers(dx_ifaceBlock* pBlockEntities, CBasicLayer* pLayer, CPointAlteration *pAlteration);
 
 	//Window
 	HWND                            m_hwnd;

@@ -56,12 +56,14 @@ void CMapLayerSetting::SetDwgLayers(std::list<DRW_Layer> * pLayers)
 	
 	for (std::list<DRW_Layer>::const_iterator it = pLayers->begin(); it != pLayers->end(); it++) {
 		tDwgLayer tempLayer;
-		std::wstring stemp((*it).name.begin(), (*it).name.end());
+		std::wstring stemp = Ansi2WChar((*it).name);
+		
 		tempLayer.sLayer = stemp;
 		tempLayer.bVisible = 1;
 
 		gDataCenter.arrDwgLayers.push_back(tempLayer);
 	}
+
 	UpdateLayerOptions();
 }
 

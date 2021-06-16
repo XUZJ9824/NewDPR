@@ -59,16 +59,6 @@ public:
     std::list<dx_ifaceBlock*>blocks;    //stores a copy of all blocks and the entities in it
     std::list<dx_ifaceImg*>images;      //temporary list to find images for link with DRW_ImageDef. Do not delete it!!
 
-    std::list<DRW_Entity*>    lstLine;      //Stores a copy of all DRW_Line
-    std::list<DRW_Entity*>  lstCircle;      //Stores a copy of all DRW_Circle
-    std::list<DRW_Entity*>     lstArc;      //Stores a copy of all DRW_Arc
-    std::list<DRW_Entity*>   lstHatch;      //Stores a copy of all DRW_Hatch
-    std::list<DRW_Entity*> lstInsert;      //Stores a copy of all DRW_Insert
-    std::list<DRW_Entity*>   lstMText;      //Stores a copy of all DRW_MText
-    std::list<DRW_Entity*>    lstText;      //Stores a copy of all DRW_Text
-    std::list<DRW_Entity*> lstLWPolyline;      //Stores a copy of all DRW_LWPolyline
-    std::list<DRW_Entity*>   lstViewport;      //Stores a copy of all DRW_Viewport
-
     dx_ifaceBlock* mBlock;              //container to store model entities
 
 

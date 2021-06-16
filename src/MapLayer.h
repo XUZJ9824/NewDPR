@@ -8,7 +8,7 @@ class CMapLayer : public CBasicLayer
 {
 public:
 	CMapLayer(CMapEngine* pEngine = NULL);
-	CMapLayer(CMapEngine* pEngine, std::wstring strLayerName);
+	CMapLayer(CMapEngine* pEngine, std::string strLayerName, std::wstring displayName);
 	~CMapLayer();
 
 	//options from dwg
@@ -20,7 +20,10 @@ public:
 	//Layer Options
 	bool m_bVisible;
 	bool m_bInitialed;
-	std::wstring m_strLayerName;
+	//Original layer name from DWG
+	std::string m_strLayerName;	
+
+	//Unicode layer name for display purpose
 	std::wstring m_strDisplayName;
 	CAirportMapEntities m_Entities;
 

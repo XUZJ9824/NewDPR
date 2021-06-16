@@ -26,8 +26,10 @@ CMapLayer::CMapLayer(CMapEngine *pEngine):
 	}
 }
 
-CMapLayer::CMapLayer(CMapEngine *pEngine, std::wstring strLayerName)
+CMapLayer::CMapLayer(CMapEngine *pEngine, std::string strLayerName, std::wstring displayName)
 {
+	Print_Debug(_T("New CMapLayer %s\r\n"), strLayerName);
+
 	m_bInitialed = false;
 	m_LineStripsBuffersInitialized = false;
 	m_PolyLinePosBufferInitialized = false;
@@ -35,7 +37,7 @@ CMapLayer::CMapLayer(CMapEngine *pEngine, std::wstring strLayerName)
 	m_bAlreadyGetInfo = false;
 
 	this->m_strLayerName = strLayerName;
-	this->m_strDisplayName = strLayerName;
+	this->m_strDisplayName = displayName;
 
 	if (pEngine)
 	{
@@ -66,11 +68,10 @@ void CMapLayer::GetLayerInfo(std::list<DRW_Layer> *players)
 {
 	if (!m_bAlreadyGetInfo) 
 	{
-		//Find dwg layer 
-		std::string layerName(m_strLayerName.begin(), m_strLayerName.end());
+		//Find dwg layer 		
 		for (std::list<DRW_Layer>::const_iterator it = players->begin(); it != players->end(); it++) 
 		{
-			if (layerName == (*it).name) 
+			if (this->m_strLayerName == (*it).name) 
 			{
 				//Get dwg layer information
 				this->lWeight = (*it).lWeight;

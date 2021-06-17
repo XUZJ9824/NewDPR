@@ -1,6 +1,19 @@
 #include "BasicLayer.h"
 #include "GraphEngine.h"
 
+CBasicLayer::CBasicLayer() 
+{
+	m_layerType = E_LAYER_UNKNOWN;	
+}
+
+CBasicLayer::CBasicLayer(CGraphEngine* pEngine, std::string strLayerName, std::wstring displayName)
+{
+	m_pEngine = pEngine;
+	m_strLayerName = strLayerName;
+	m_strDisplayName = displayName;
+	m_layerType = E_LAYER_UNKNOWN;
+}
+
 /// Create a PolylineEntity object from a CADPolylineBase one.
 /// The geometry of a CADPolylineBase is defined by a collection of points.
 /// In order to improve the performance of display, the points are sampled

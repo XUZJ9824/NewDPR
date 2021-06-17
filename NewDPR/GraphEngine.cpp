@@ -1,4 +1,4 @@
-#include "GraphEngine.h"
+﻿#include "GraphEngine.h"
 
 #pragma comment(lib, "d3d9.lib")
 #pragma comment(lib, "d3dx9.lib")
@@ -17,7 +17,7 @@ int CGraphEngine::m_viewWidth = 1024, CGraphEngine::m_viewHeight = 768;
 double CGraphEngine::m_scale = 2.0;
 double CGraphEngine::m_rotate = 0;
 D3DXMATRIX   CGraphEngine::matWorld;
-D3DXMATRIX   CGraphEngine::matTranslate, CGraphEngine::matRotation, CGraphEngine::matScale;     //先缩放、再旋转、最后平移
+D3DXMATRIX   CGraphEngine::matTranslate, CGraphEngine::matRotation, CGraphEngine::matScale;     //å…ˆç¼©æ”¾ã€å†æ—‹è½¬ã€æœ€åŽå¹³ç§»
 D3DXMATRIX   CGraphEngine::matView;    // the view transform matrix
 D3DXMATRIX   CGraphEngine::matProjection;     // the projection transform matrix
 	
@@ -262,15 +262,15 @@ void CGraphEngine::UpdateMatrix()
 	matView._33 = -matView._33;
 	matView._34 = -matView._34;*/
 #else
-	D3DXVECTOR3 vEye(0.0f, 0.0f, -1000.0f);         //摄像机的位置  
-	D3DXVECTOR3 vAt(0.0f, 0.0f, 0.0f);              //观察点的位置  
-	D3DXVECTOR3 vUp(0.0f, 1.0f, 0.0f);              //向上的向量  
-	D3DXMatrixLookAtLH(&matView, &vEye, &vAt, &vUp); //计算出取景变换矩阵  
+	D3DXVECTOR3 vEye(0.0f, 0.0f, -1000.0f);         //æ‘„åƒæœºçš„ä½ç½®  
+	D3DXVECTOR3 vAt(0.0f, 0.0f, 0.0f);              //è§‚å¯Ÿç‚¹çš„ä½ç½®  
+	D3DXVECTOR3 vUp(0.0f, 1.0f, 0.0f);              //å‘ä¸Šçš„å‘é‡  
+	D3DXMatrixLookAtLH(&matView, &vEye, &vAt, &vUp); //è®¡ç®—å‡ºå–æ™¯å˜æ¢çŸ©é˜µ  
 #endif 
 
 	D3DXMatrixIdentity(&matProjection);
 #if 0
-	//创建一个用户定制的左手坐标系的正交投影矩阵
+	//åˆ›å»ºä¸€ä¸ªç”¨æˆ·å®šåˆ¶çš„å·¦æ‰‹åæ ‡ç³»çš„æ­£äº¤æŠ•å½±çŸ©é˜µ
 	D3DXMatrixOrthoOffCenterRH(&matProjection,
 		m_cxOffset - m_viewWidth*m_scale*0.5f,
 		m_cxOffset + m_viewWidth*m_scale*0.5f,
@@ -328,4 +328,104 @@ void CGraphEngine::SetTransform(int cx, int cy)
 	m_cxOffset = cx;
 	m_cyOffset = cy;
 	UpdateMatrix();
+}
+
+
+void CGraphEngine::StartDraw() 
+{
+	OutputDebugString(LOCATION);
+	HRESULT hr = 0;
+	if (m_pd3dDevice)
+	{
+		//--clear the window to black 
+		hr = m_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+		hr = m_pd3dDevice->BeginScene(); //--开始通知显卡要进行渲染 
+#if 1
+		DrawLine(m_pd3dDevice, -10, 0, 10, 0, D3DCOLOR_XRGB(255, 255, 255)); //X-Asile
+		DrawLine(m_pd3dDevice, 0, -10, 0, 10, D3DCOLOR_XRGB(255, 255, 255)); //Y-Asile   
+																			 //hr = DrawRect(m_pd3dDevice, -5, -5, 10, 10, D3DCOLOR_XRGB(255, 0, 0)); //Center Rect
+		DrawCircle(m_pd3dDevice, 0, 0, 10, 10, D3DCOLOR_XRGB(255, 0, 0));
+#endif //0		
+
+	}
+}
+void CGraphEngine::EndDraw() 
+{
+	OutputDebugString(LOCATION);
+	if (m_pd3dDevice)
+	{
+		m_pd3dDevice->EndScene();  //--结束图形的渲染 
+		m_pd3dDevice->Present(NULL, NULL, NULL, NULL);//--翻页 
+	}
+};
+
+
+void CGraphEngine::DrawCircle(LPDIRECT3DDEVICE9 pDevice, FLOAT X, FLOAT Y, FLOAT RadiusW, FLOAT RadiusH, D3DCOLOR dColor)
+{
+	int cnt = 0;
+
+	CONST INT NUMPOINTS = 50;
+	CONST FLOAT Angle = (2.0f * D3DX_PI) / NUMPOINTS;
+
+	Vertex* pVertexList;
+
+	m_pVertexBuffer->Lock(0, 0, (PVOID*)&pVertexList, D3DLOCK_NOSYSLOCK | D3DLOCK_DISCARD);
+
+	for (INT i = 0; i <= NUMPOINTS; i++)
+	{
+		FLOAT CurAngle = (FLOAT)i * Angle;
+		FLOAT DrawPosX = (X + RadiusW * cos(CurAngle));
+		FLOAT DrawPosY = (Y - RadiusH * sin(CurAngle));
+
+		pVertexList[i].X = DrawPosX;
+		pVertexList[i].Y = DrawPosY;
+		pVertexList[i].Z = 0.0f;
+#if (CUSTOMVERTEX & D3DFVF_XYZRHW)
+		pVertexList[i].RHW = 1.0f;
+#endif
+		pVertexList[i].dColor = dColor;
+	}
+
+	m_pVertexBuffer->Unlock();
+
+	pDevice->SetTexture(0, NULL);
+	pDevice->SetStreamSource(0, m_pVertexBuffer, 0, sizeof(Vertex));
+	pDevice->SetFVF(CUSTOMVERTEX);
+
+	pDevice->DrawPrimitive(D3DPT_LINESTRIP, 0, NUMPOINTS);
+}
+
+void CGraphEngine::DrawLine(LPDIRECT3DDEVICE9 pDevice, FLOAT X, FLOAT Y, FLOAT X2, FLOAT Y2, D3DCOLOR dColor)
+{
+	Vertex* pVertexList;
+
+	m_pVertexBuffer->Lock(0, 0, (PVOID*)&pVertexList, D3DLOCK_NOSYSLOCK | D3DLOCK_DISCARD);
+
+	pVertexList[0].X = X;
+	pVertexList[0].Y = Y;
+	pVertexList[0].Z = 0.0f;
+#if (CUSTOMVERTEX & D3DFVF_XYZRHW)
+	pVertexList[0].RHW = 1.0f;
+#endif
+	pVertexList[0].dColor = dColor;
+
+	pVertexList[1].X = X2;
+	pVertexList[1].Y = Y2;
+	pVertexList[1].Z = 0.0f;
+#if (CUSTOMVERTEX & D3DFVF_XYZRHW)
+	pVertexList[1].RHW = 1.0f;
+#endif
+	pVertexList[1].dColor = dColor;
+
+	m_pVertexBuffer->Unlock();
+
+	pDevice->SetTransform(D3DTS_WORLD, &matWorld);
+	pDevice->SetTransform(D3DTS_VIEW, &matView);
+	pDevice->SetTransform(D3DTS_PROJECTION, &matProjection);
+
+	pDevice->SetTexture(0, NULL);
+	pDevice->SetStreamSource(0, m_pVertexBuffer, 0, sizeof(Vertex));
+	pDevice->SetFVF(CUSTOMVERTEX);
+
+	pDevice->DrawPrimitive(D3DPT_LINELIST, 0, 1);
 }

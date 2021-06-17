@@ -4,6 +4,7 @@
 CDrawEngine::CDrawEngine()
 {
 	OutputDebugString(LOCATION);
+	InitDrawLayers();
 }
 
 
@@ -15,7 +16,16 @@ CDrawEngine::~CDrawEngine()
 
 void CDrawEngine::DoDraw()
 {
-	
+	if (m_pd3dDevice)
+	{
+		//draw each layers
+		for (std::vector<CBasicLayer*>::const_iterator it = this->m_lstDrawLayers.begin(); it != m_lstDrawLayers.end(); it++)
+		{
+			if (IsLayerVisible((*it)->m_strDisplayName)) {
+				(*it)->DoDraw();
+			}
+		}
+	}
 }
 
 bool CDrawEngine::InitDrawLayers()
@@ -25,7 +35,9 @@ bool CDrawEngine::InitDrawLayers()
 	bool rt = false;
 	for (int i = 0; i < TOTAL_DRAW_LAYERS; i++)
 	{
-		CDrawLayer *pNewLayer = new CDrawLayer();
+		//DrawLayer will not use the Dwg Layer name for here.
+		CDrawLayer *pNewLayer = new CDrawLayer(this, "", sDrawLayers[i]);
+		m_lstDrawLayers.push_back(pNewLayer);
 	}
 
 	return rt;

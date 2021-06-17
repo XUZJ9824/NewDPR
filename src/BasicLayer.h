@@ -25,9 +25,9 @@ class CDrawEngine;
 class CBasicLayer
 {
 public:
-	CBasicLayer() {
-		m_layerType = E_LAYER_UNKNOWN;
-	};
+	CBasicLayer();
+	CBasicLayer(CGraphEngine* pEngine, std::string strLayerName, std::wstring displayName);
+
 	~CBasicLayer() {};
 public:
     /*分散线段*/

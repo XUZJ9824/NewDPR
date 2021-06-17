@@ -35,106 +35,22 @@ bool CMapEngine::loadDwgMap(std::string strImagePath)
 void CMapEngine::DoDraw()
 {
 	OutputDebugString(LOCATION);
-	HRESULT hr = 0;
 	if(m_pd3dDevice)
-	{
-		//--clear the window to black 
-		hr = m_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-		hr = m_pd3dDevice->BeginScene(); //--开始通知显卡要进行渲染 
-#if 1
-		DrawLine(m_pd3dDevice, -10, 0, 10, 0, D3DCOLOR_XRGB(255, 255, 255)); //X-Asile
-		DrawLine(m_pd3dDevice, 0, -10, 0, 10, D3DCOLOR_XRGB(255, 255, 255)); //Y-Asile   
-																																	  //hr = DrawRect(m_pd3dDevice, -5, -5, 10, 10, D3DCOLOR_XRGB(255, 0, 0)); //Center Rect
-		DrawCircle(m_pd3dDevice, 0, 0, 10, 10, D3DCOLOR_XRGB(255, 0, 0));
-#endif //0
+	{		
 		//draw each layers
-		for (std::vector<CMapLayer*>::const_iterator it = this->m_lstMapLayers.begin(); it != m_lstMapLayers.end(); it++) 
+		for (std::vector<CMapLayer*>::const_iterator it = this->m_lstMapLayers.begin(); it != m_lstMapLayers.end(); it++)
 		{
 			if (IsLayerVisible((*it)->m_strDisplayName)) {
 				(*it)->DoDraw(); 
 			}
-		}
-
-		m_pd3dDevice->EndScene();  //--结束图形的渲染 
-		m_pd3dDevice->Present(NULL, NULL, NULL, NULL);//--翻页 
+		}		
 	}
 }
-
-void CMapEngine::DrawCircle(LPDIRECT3DDEVICE9 pDevice, FLOAT X, FLOAT Y, FLOAT RadiusW, FLOAT RadiusH, D3DCOLOR dColor)
-{
-	int cnt = 0;
-
-	CONST INT NUMPOINTS = 50;
-	CONST FLOAT Angle = (2.0f * D3DX_PI) / NUMPOINTS;
-
-	Vertex* pVertexList;
-
-	m_pVertexBuffer->Lock(0, 0, (PVOID*)&pVertexList, D3DLOCK_NOSYSLOCK | D3DLOCK_DISCARD);
-
-	for (INT i = 0; i <= NUMPOINTS; i++)
-	{
-		FLOAT CurAngle = (FLOAT)i * Angle;
-		FLOAT DrawPosX = (X + RadiusW * cos(CurAngle));
-		FLOAT DrawPosY = (Y - RadiusH * sin(CurAngle));
-
-		pVertexList[i].X = DrawPosX;
-		pVertexList[i].Y = DrawPosY;
-		pVertexList[i].Z = 0.0f;
-#if (CUSTOMVERTEX & D3DFVF_XYZRHW)
-		pVertexList[i].RHW = 1.0f;
-#endif
-		pVertexList[i].dColor = dColor;
-	}
-
-	m_pVertexBuffer->Unlock();
-
-	pDevice->SetTexture(0, NULL);
-	pDevice->SetStreamSource(0, m_pVertexBuffer, 0, sizeof(Vertex));
-	pDevice->SetFVF(CUSTOMVERTEX);
-
-	pDevice->DrawPrimitive(D3DPT_LINESTRIP, 0, NUMPOINTS);
-}
-
-void CMapEngine::DrawLine(LPDIRECT3DDEVICE9 pDevice, FLOAT X, FLOAT Y, FLOAT X2, FLOAT Y2, D3DCOLOR dColor)
-{
-	Vertex* pVertexList;
-
-	m_pVertexBuffer->Lock(0, 0, (PVOID*)&pVertexList, D3DLOCK_NOSYSLOCK | D3DLOCK_DISCARD);
-
-	pVertexList[0].X = X;
-	pVertexList[0].Y = Y;
-	pVertexList[0].Z = 0.0f;
-#if (CUSTOMVERTEX & D3DFVF_XYZRHW)
-	pVertexList[0].RHW = 1.0f;
-#endif
-	pVertexList[0].dColor = dColor;
-
-	pVertexList[1].X = X2;
-	pVertexList[1].Y = Y2;
-	pVertexList[1].Z = 0.0f;
-#if (CUSTOMVERTEX & D3DFVF_XYZRHW)
-	pVertexList[1].RHW = 1.0f;
-#endif
-	pVertexList[1].dColor = dColor;
-
-	m_pVertexBuffer->Unlock();
-
-	pDevice->SetTransform(D3DTS_WORLD, &matWorld);
-	pDevice->SetTransform(D3DTS_VIEW, &matView);
-	pDevice->SetTransform(D3DTS_PROJECTION, &matProjection);
-
-	pDevice->SetTexture(0, NULL);
-	pDevice->SetStreamSource(0, m_pVertexBuffer, 0, sizeof(Vertex));
-	pDevice->SetFVF(CUSTOMVERTEX);
-
-	pDevice->DrawPrimitive(D3DPT_LINELIST, 0, 1);
-}
-
 
 CMapLayer* CMapEngine::FindOrNewMapLayer(std::string  strName)
 {
 	CMapLayer* pLayer = NULL;
-	for (std::vector<CMapLayer*>::const_iterator it = m_lstMapLayers.begin(); it != m_lstMapLayers.end(); ++it) 
+	for (std::vector<CMapLayer*>::const_iterator it = m_lstMapLayers.begin(); it != m_lstMapLayers.end(); ++it)
 	{
 		CMapLayer *pCurrent = *it;
 		if (pCurrent->m_strLayerName == strName) 
@@ -167,7 +83,7 @@ void CMapEngine::ClearMapLayers()
 	m_lstMapLayers.clear();
 }
 
-bool CMapEngine::ParseDwgToLayers(dx_ifaceBlock* pBlockEntities, CBasicLayer* pLayer, CPointAlteration *pAlteration)
+bool CMapEngine::ParseDwgToLayers(dx_ifaceBlock* pBlockEntities, CMapLayer* pLayer, CPointAlteration *pAlteration)
 {
 	bool rt = false;
 
@@ -199,7 +115,7 @@ bool CMapEngine::ParseDwgToLayers()
 	}
 
 	//dwg entities to D3D vertex for rendering purpose
-	for (std::vector<CMapLayer*>::const_iterator it = this->m_lstMapLayers.begin(); it != this->m_lstMapLayers.end(); it++) 
+	for (std::vector<CMapLayer*>::const_iterator it = this->m_lstMapLayers.begin(); it != this->m_lstMapLayers.end(); it++)
 	{
 		(*it)->InitLineListsBuffer();
 		(*it)->InitPolyLineBuffer();
@@ -208,7 +124,7 @@ bool CMapEngine::ParseDwgToLayers()
 	return rt;
 }
 
-void  CMapEngine::ExtractDwgEntityData(DRW_Entity *pDwgEntity, CBasicLayer* pLayer, CPointAlteration *pAlteration, DRW_Block* pDwgBlk) {
+void  CMapEngine::ExtractDwgEntityData(DRW_Entity *pDwgEntity, CMapLayer* pLayer, CPointAlteration *pAlteration, DRW_Block* pDwgBlk) {
 	CEntity *pNewEntity = NULL;
 
 	if (pDwgEntity) 
@@ -458,7 +374,7 @@ cadInsert.Block.Box.Center: Block Internal Center:                  (3674, -1814
 cadInsert.Block.Box.Width: Block width :                            129
 cadInsert.Block.Box.Height: Block height:                           49
 */
-CEntity* CMapEngine::DwgInsertToPolyLine(DRW_Insert * pDwgEntity, CPointAlteration *pAlteration, CBasicLayer* pLayer)
+CEntity* CMapEngine::DwgInsertToPolyLine(DRW_Insert * pDwgEntity, CPointAlteration *pAlteration, CMapLayer* pLayer)
 {
 	Print_Debug(_T("DwgPolylineBaseToPolyLine Insert\r\n"));
 	CEntity* pEntity = NULL;

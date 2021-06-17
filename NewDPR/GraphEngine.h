@@ -62,5 +62,13 @@ public:
 
 	//Buffer for Engine specific display. others are covered by buffer from each Layer
 	static IDirect3DVertexBuffer9* m_pVertexBuffer;
+
+	//Draw
+	static void StartDraw();
+	static void EndDraw();
+
+	static void DrawLine(LPDIRECT3DDEVICE9 pDevice, FLOAT X, FLOAT Y, FLOAT X2, FLOAT Y2, D3DCOLOR dColor);
+	static void DrawCircle(LPDIRECT3DDEVICE9 pDevice, FLOAT X, FLOAT Y, FLOAT RadiusW, FLOAT RadiusH, D3DCOLOR dColor);
+
 };
 

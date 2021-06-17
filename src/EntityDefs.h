@@ -49,6 +49,9 @@ typedef enum
 	ePolylineEntity,
 	ePolygonEntity,
 	eTextEntity,
+	eDrawLine,
+	eDrawPolyLine,
+	eDrawPoint,
 	eUnknow
 }E_EntityType;
 
@@ -58,6 +61,29 @@ public:
 	CPointF();
 	CPointF(double fx, double fy);	
 	~CPointF();
+
+    CPointF& operator = (const CPointF& newPoint) { 
+		this->X = newPoint.X; 
+		this->Y = newPoint.Y; 
+		this->Z = newPoint.Z; 
+		this->m_bIsEmpty = newPoint.m_bIsEmpty; 
+		
+		return *this;
+	}
+	
+	bool operator == (const CPointF& rPoint)
+	{
+		if( (this->X == rPoint.X) && 
+		    (this->Y == rPoint.Y) &&
+			(this->Z == rPoint.Z))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+	}
 
 	double X, Y, Z;
 	bool m_bIsEmpty;

@@ -19,6 +19,7 @@ CMapLayerSetting::CMapLayerSetting(CWnd* pParent /*=NULL*/)
 
 CMapLayerSetting::~CMapLayerSetting()
 {
+	DestroyLayerChecks();
 }
 
 void CMapLayerSetting::DoDataExchange(CDataExchange* pDX)

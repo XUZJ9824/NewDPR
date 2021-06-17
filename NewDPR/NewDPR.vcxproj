@@ -196,8 +196,12 @@
     <ClInclude Include="..\src\MapLayer.h" />
     <ClInclude Include="..\src\vsstream.h" />
     <ClInclude Include="ClassView.h" />
+    <ClInclude Include="DrawEngine.h" />
     <ClInclude Include="DrawingLayer.h" />
+    <ClInclude Include="DrawLayer.h" />
+    <ClInclude Include="DrawObject.h" />
     <ClInclude Include="FileView.h" />
+    <ClInclude Include="GraphEngine.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MapLayerSetting.h" />
     <ClInclude Include="NewDPR.h" />
@@ -227,9 +231,20 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\src\vsstream.cpp" />
+    <ClCompile Include="BasicLayer.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="ClassView.cpp" />
+    <ClCompile Include="DrawEngine.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="DrawingLayer.cpp" />
+    <ClCompile Include="DrawLayer.cpp" />
+    <ClCompile Include="DrawObject.cpp" />
     <ClCompile Include="FileView.cpp" />
+    <ClCompile Include="GraphEngine.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="MapLayerSetting.cpp" />
     <ClCompile Include="NewDPR.cpp" />

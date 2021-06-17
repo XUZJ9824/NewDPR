@@ -10,6 +10,13 @@ using namespace std;
 
 tDataCenter gDataCenter;
 
+const WCHAR * sDrawLayers[TOTAL_DRAW_LAYERS] =
+{
+	_T("Draw Layer Line"),
+	_T("Draw Layer Point"),
+	_T("Draw Layer PolyLine")
+};
+
 int Print(const TCHAR *strToPrint)
 {
 	int rt = wcslen(strToPrint);

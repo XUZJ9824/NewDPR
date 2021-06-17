@@ -94,3 +94,8 @@ inline char Ascii2Hex(const char ch);
 std::wstring Ansi2WChar(std::string str);
 
 std::wstring ReplaceWCSWithPattern(const std::wstring &message, const std::wstring &pattern, const std::wstring &replace);
+
+
+//////////////////////////Drawing Settings////////////////////////////
+#define TOTAL_DRAW_LAYERS 3
+const WCHAR * sDrawLayers[];

@@ -28,8 +28,6 @@ public:
 	static void SetTransform(int x, int y);
 	
 	//Zoom, Transition, Rotation, Coordinate
-	static float m_ArpX;
-	static float m_ArpY;
 	static int m_cxOffset, m_cyOffset;
 	static int m_viewWidth, m_viewHeight;
 	static double m_scale;

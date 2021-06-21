@@ -12,8 +12,8 @@
 #define USE_DWG
 
 #ifdef USE_DWG
-#define OFFSET_X 0 //(9411.5)
-#define OFFSET_Y 0 //(9091.25)
+#define OFFSET_X 9411.5  //(9411.5)
+#define OFFSET_Y 9091.25 //(9091.25)
 //#define FILE_DWG "D:\\Home\\WK\\TTW_SRC\\3rdpartysw\\libdxfrw\\bin\\dwgs\\QD_MAP_20210321.dwg"
 //#define FILE_DWG "D:\\Home\\WK\\TTW_SRC\\APPLICATIONS\\Data\\dpr_maps\\QD_MAP_20210329.dwg"
 #define FILE_DWG "D:\\Home\\WK\\TTW_SRC\\APPLICATIONS\\Data\\dpr_maps\\UMQ_20200508_v5.dwg"
@@ -78,8 +78,28 @@ typedef struct
 
 typedef struct 
 {
+	double fAprX;	//Screen coordinate X
+	double fAprY;	//Screen coordinate Y
+	double fAprLat; //Latitude of Map center
+	double fAprLon; //Longitude of Map center
+	double fRotation; //Map Rotation Angle
+
+}tMapSetting;
+
+typedef struct tDataCenter
+{
+	tDataCenter() 
+	{
+		mapSettings.fAprX = OFFSET_X;
+		mapSettings.fAprY = OFFSET_Y;
+		mapSettings.fAprLat = 0;
+		mapSettings.fAprLon = 0;
+		mapSettings.fRotation = 0;
+	};
+
 	//name from each layer, based from dwg map file
 	std::vector<tDwgLayer>  arrDwgLayers;
+	tMapSetting             mapSettings;
 }tDataCenter;
 
 extern tDataCenter gDataCenter;

@@ -10,8 +10,6 @@
 #include <math.h>
 
 //Zoom, Transition, Rotation, Coordinate
-float CGraphEngine::m_ArpX = OFFSET_X;
-float CGraphEngine::m_ArpY = OFFSET_Y;
 int CGraphEngine::m_cxOffset =0, CGraphEngine::m_cyOffset=0;
 int CGraphEngine::m_viewWidth = 1024, CGraphEngine::m_viewHeight = 768;
 double CGraphEngine::m_scale = 2.0;

@@ -93,6 +93,9 @@
     <ClInclude Include="DrawLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DlgSetMapProperties.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NewDPR.cpp">
@@ -162,6 +165,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BasicLayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgSetMapProperties.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

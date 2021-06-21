@@ -42,7 +42,12 @@ void CMapLayerSetting::OnRangeButtonClick(UINT nID)
 
 	if (index < gDataCenter.arrDwgLayers.size())
 	{
-		gDataCenter.arrDwgLayers[index].bVisible = iChkStatus;
+		if (gDataCenter.arrDwgLayers[index].bVisible != iChkStatus)
+		{
+			gDataCenter.arrDwgLayers[index].bVisible = iChkStatus;
+
+			SendMessageToViews(GetParent()->GetSafeHwnd(), WM_COMMAND, WM_PAINT, 0);
+		}
 	}
 	else 
 	{
@@ -139,11 +144,26 @@ void CMapLayerSetting::DestroyLayerChecks()
 	}
 }
 
-
-
-
 void CMapLayerSetting::OnBnClickedOk()
 {
-	// TODO: Add your control notification handler code here
+	// TODO: Add your control notification handler code here	
+
 	CDialogEx::OnOK();
+}
+
+void CMapLayerSetting::SendMessageToViews(HWND hWndParent, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	BeginWaitCursor();
+	for (HWND hWndChild = ::GetTopWindow(hWndParent); hWndChild != NULL; hWndChild = ::GetNextWindow(hWndChild, GW_HWNDNEXT))
+	{
+		// send message
+		CWnd* pWnd = CWnd::FromHandlePermanent(hWndChild);
+		if (pWnd != NULL && pWnd->IsKindOf(RUNTIME_CLASS(CView)))
+			AfxCallWndProc(pWnd, pWnd->m_hWnd, message, wParam, lParam);
+
+		// send to child windows after parent
+		if (::GetTopWindow(hWndChild) != NULL)
+			SendMessageToViews(hWndChild, message, wParam, lParam);
+	}
+	EndWaitCursor();
 }

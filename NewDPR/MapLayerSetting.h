@@ -33,6 +33,7 @@ public:
 
 	/*set Layer List information from DWG for display setting purpose*/
 	void SetDwgLayers(std::list<DRW_Layer> * pLayers);
+	void SendMessageToViews(HWND hWndParent, UINT message, WPARAM wParam, LPARAM lParam);
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME

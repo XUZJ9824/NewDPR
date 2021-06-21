@@ -405,8 +405,8 @@ void CMapEngine::GetArpRelativeCoordinates(CPointF *ptSrc, CPointF *ptDst, CPoin
 	CPointF ptTemp;
 	pAlteration->Alterate(ptSrc, &ptTemp);
 
-	ptDst->X = ptTemp.X - m_ArpX;
-	ptDst->Y = ptTemp.Y - m_ArpY;
+	ptDst->X = ptTemp.X - gDataCenter.mapSettings.fAprX;
+	ptDst->Y = ptTemp.Y - gDataCenter.mapSettings.fAprY;
 }
 
 dx_ifaceBlock* CMapEngine::FindBlock(std::string strBlock) 

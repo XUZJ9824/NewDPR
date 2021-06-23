@@ -23,6 +23,37 @@ class dxfReader;
 class dwgBuffer;
 class DRW_Polyline;
 
+/*class DRW_Point;
+class DRW_Line;
+class DRW_Ray;
+class DRW_Xline;
+class DRW_Circle;
+class DRW_Arc;
+class DRW_Ellipse;
+class DRW_Trace;
+class DRW_Solid;
+class DRW_3Dface;
+class DRW_Block;
+class DRW_Insert;
+class DRW_LWPolyline;
+class DRW_Text;
+class DRW_MText;
+class DRW_Vertex;
+class DRW_Polyline;
+class DRW_Spline;
+class DRW_Hatch;
+class DRW_Image;
+class DRW_Dimension;
+class DRW_DimAligned;
+class DRW_DimLinear;
+class DRW_DimRadial;
+class DRW_DimDiametric;
+class DRW_DimAngular;
+class DRW_DimAngular3p;
+class DRW_DimOrdinate;
+class DRW_Leader;
+class DRW_Viewport;*/
+
 namespace DRW {
 
    //! Entity's type.
@@ -911,148 +942,6 @@ private:
     DRW_Coord *fitpoint;       /*!< current fit point to add data */
 };
 
-//! Class to handle hatch loop
-/*!
-*  Class to handle hatch loop
-*  @author Rallaz
-*/
-class DRW_HatchLoop {
-public:
-    DRW_HatchLoop(int t) {
-        type = t;
-        numedges = 0;
-		Print_Debug(L"New Delete DRW_HatchLoop() 0x%x\r\n", (void*)(this));
-    }
-
-    ~DRW_HatchLoop() {
-		Print_Debug(L"New Delete ~DRW_HatchLoop() 0x%x\r\n", (void*)(this));
-        while (!objlist.empty()) {
-		   delete objlist[objlist.size() - 1];
-           objlist.pop_back();
-         }
-    }
-
-    void update() {
-        numedges = objlist.size();
-    }
-
-public:
-    int type;               /*!< boundary path type, code 92, polyline=2, default=0 */
-    int numedges;           /*!< number of edges (if not a polyline), code 93 */
-//TODO: store lwpolylines as entities
-//    std::vector<DRW_LWPolyline *> pollist;  /*!< polyline list */
-    std::vector<DRW_Entity *> objlist;      /*!< entities list */
-};
-
-//! Class to handle hatch entity
-/*!
-*  Class to handle hatch entity
-*  @author Rallaz
-*/
-//TODO: handle lwpolylines, splines and ellipses
-class DRW_Hatch : public DRW_Point {
-    SETENTFRIENDS
-public:
-    DRW_Hatch() {
-        eType = DRW::HATCH;
-        angle = scale = 0.0;
-        basePoint.x = basePoint.y = basePoint.z = 0.0;
-        loopsnum = hstyle = associative = 0;
-        solid = hpattern = 1;
-        deflines = doubleflag = 0;
-        loop = NULL;
-        clearEntities();
-
-		Print_Debug(L"New Delete DRW_Hatch() 0x%x\r\n", (void*)(this));
-    }
-
-    ~DRW_Hatch() {
-		Print_Debug(L"New Delete ~DRW_Hatch() 0x%x\r\n", (void*)(this));
-        while (!looplist.empty()) {
-			//Print_Debug(L"Delete Loop: 0x%x\r\n", (void*)(looplist[looplist.size() - 1]));
-		    //TBD: delete looplist[looplist.size() - 1];			
-           looplist.pop_back();
-         }
-    }
-
-    void appendLoop (DRW_HatchLoop *v) {
-        looplist.push_back(v);
-		//Print_Debug(L"Add Loop: 0x%x, 0x%x\r\n", (void*)(this), (void*)(v));
-    }
-
-    virtual void applyExtrusion(){}
-
-protected:
-    void parseCode(int code, dxfReader *reader);
-    virtual bool parseDwg(DRW::Version version, dwgBuffer *buf, duint32 bs=0);
-
-public:
-    UTF8STRING name;           /*!< hatch pattern name, code 2 */
-    int solid;                 /*!< solid fill flag, code 70, solid=1, pattern=0 */
-    int associative;           /*!< associativity, code 71, associatve=1, non-assoc.=0 */
-    int hstyle;                /*!< hatch style, code 75 */
-    int hpattern;              /*!< hatch pattern type, code 76 */
-    int doubleflag;            /*!< hatch pattern double flag, code 77, double=1, single=0 */
-    int loopsnum;              /*!< namber of boundary paths (loops), code 91 */
-    double angle;              /*!< hatch pattern angle, code 52 */
-    double scale;              /*!< hatch pattern scale, code 41 */
-    int deflines;              /*!< number of pattern definition lines, code 78 */
-
-    std::vector<DRW_HatchLoop *> looplist;  /*!< polyline list */
-
-private:
-    void clearEntities(){
-        pt = line = NULL;
-        pline = NULL;
-        arc = NULL;
-        ellipse = NULL;
-        spline = NULL;
-        plvert = NULL;
-    }
-
-    void addLine() {
-        clearEntities();
-        if (loop) {
-            pt = line = new DRW_Line;
-            loop->objlist.push_back(line);
-        }
-    }
-
-    void addArc() {
-        clearEntities();
-        if (loop) {
-            pt = arc = new DRW_Arc;
-            loop->objlist.push_back(arc);
-        }
-    }
-
-    void addEllipse() {
-        clearEntities();
-        if (loop) {
-            pt = ellipse = new DRW_Ellipse;
-            loop->objlist.push_back(ellipse);
-        }
-    }
-
-    void addSpline() {
-        clearEntities();
-        if (loop) {
-            pt = NULL;
-            spline = new DRW_Spline;
-            loop->objlist.push_back(spline);
-        }
-    }
-
-    DRW_HatchLoop *loop;       /*!< current loop to add data */
-    DRW_Line *line;
-    DRW_Arc *arc;
-    DRW_Ellipse *ellipse;
-    DRW_Spline *spline;
-    DRW_LWPolyline *pline;
-    DRW_Point *pt;
-    DRW_Vertex2D *plvert;
-    bool ispol;
-};
 
 //! Class to handle image entity
 /*!
@@ -1503,6 +1392,287 @@ public:
 private:
     duint32 frozenLyCount;
 };//RLZ: missing 15,25, 72, 331, 90, 340, 1, 281, 71, 74, 110, 120, 130, 111, 121,131, 112,122, 132, 345,346, and more...
+
+  //! Class to handle hatch loop
+  /*!
+  *  Class to handle hatch loop
+  *  @author Rallaz
+  */
+class DRW_HatchLoop {
+public:
+	DRW_HatchLoop(const DRW_HatchLoop& r)
+	{
+		Print_Debug(L"New Delete DRW_HatchLoop() 0x%x\r\n", (void*)(this));
+
+		type = r.type;
+		numedges = r.numedges;
+		for (std::vector<DRW_Entity *>::const_iterator it = r.objlist.begin(); it != r.objlist.end(); it++)
+		{
+			switch ((*it)->eType)
+			{
+			case DRW::E3DFACE:   //0
+				objlist.push_back(new DRW_3Dface(*((DRW_3Dface*)(*it))));
+				break;
+			case DRW::ARC:
+				objlist.push_back(new DRW_Arc(*((DRW_Arc*)(*it))));
+				break;
+			case DRW::BLOCK: // and ENDBLK
+				objlist.push_back(new DRW_Block(*((DRW_Block*)(*it))));
+				break;
+			case DRW::CIRCLE:
+				objlist.push_back(new DRW_Circle(*((DRW_Circle*)(*it))));
+				break;
+			case DRW::DIMENSION:
+				objlist.push_back(new DRW_Dimension(*((DRW_Dimension*)(*it))));
+				break;
+			case DRW::DIMALIGNED: //5
+				objlist.push_back(new DRW_DimAligned(*((DRW_DimAligned*)(*it))));
+				break;
+			case DRW::DIMLINEAR:
+				objlist.push_back(new DRW_DimLinear(*((DRW_DimLinear*)(*it))));
+				break;
+			case DRW::DIMRADIAL:
+				objlist.push_back(new DRW_Arc(*((DRW_Arc*)(*it))));
+				break;
+			case DRW::DIMDIAMETRIC:
+				objlist.push_back(new DRW_DimDiametric(*((DRW_DimDiametric*)(*it))));
+				break;
+			case DRW::DIMANGULAR:
+				objlist.push_back(new DRW_DimAngular(*((DRW_DimAngular*)(*it))));
+				break;
+			/*case DRW::DIMANGULAR3P: //10
+				objlist.push_back(new DRW_Arc(*((DRW_Arc*)(*it)));
+				break;*/
+			case DRW::DIMORDINATE:
+				objlist.push_back(new DRW_DimOrdinate(*((DRW_DimOrdinate*)(*it))));
+				break;
+			case DRW::ELLIPSE:
+				objlist.push_back(new DRW_Ellipse(*((DRW_Ellipse*)(*it))));
+				break;
+			/*case DRW::HATCH:
+				objlist.push_back(new DRW_Hatch(*((DRW_Hatch*)(*it))));
+				break;*/
+			case DRW::IMAGE:
+				objlist.push_back(new DRW_Image(*((DRW_Image*)(*it))));
+				break;
+			case DRW::INSERT: //15
+				objlist.push_back(new DRW_Insert(*((DRW_Insert*)(*it))));
+				break;
+			case DRW::LEADER:
+				objlist.push_back(new DRW_Leader(*((DRW_Leader*)(*it))));
+				break;
+			case DRW::LINE:
+				objlist.push_back(new DRW_Line(*((DRW_Line*)(*it))));
+				break;
+			case DRW::LWPOLYLINE:
+				objlist.push_back(new DRW_LWPolyline(*((DRW_LWPolyline*)(*it))));
+				break;
+			case DRW::MTEXT:
+				objlist.push_back(new DRW_MText(*((DRW_MText*)(*it))));
+				break;
+			case DRW::POINT: //20
+				objlist.push_back(new DRW_Point(*((DRW_Point*)(*it))));
+				break;
+			case DRW::POLYLINE:
+				objlist.push_back(new DRW_Polyline(*((DRW_Polyline*)(*it))));
+				break;
+			case DRW::RAY:
+				objlist.push_back(new DRW_Ray(*((DRW_Ray*)(*it))));
+				break;
+			case DRW::SOLID:
+				objlist.push_back(new DRW_Solid(*((DRW_Solid*)(*it))));
+				break;
+			case DRW::SPLINE:
+				objlist.push_back(new DRW_Spline(*((DRW_Spline*)(*it))));
+				break;
+			case DRW::TEXT:
+				objlist.push_back(new DRW_Text(*((DRW_Text*)(*it))));
+				break;
+			case DRW::dwgTRACE:
+				objlist.push_back(new DRW_Trace(*((DRW_Trace*)(*it))));
+				break;
+			/*case DRW::UNDERLAY:
+				objlist.push_back(new DRW_Underlay(*((DRW_Underlay*)(*it)));
+				break;*/
+			case DRW::VERTEX:
+				objlist.push_back(new DRW_Vertex(*((DRW_Vertex*)(*it))));
+				break;
+			case DRW::VIEWPORT:
+				objlist.push_back(new DRW_Viewport(*((DRW_Viewport*)(*it))));
+				break;
+			case DRW::XLINE:
+				objlist.push_back(new DRW_Xline(*((DRW_Xline*)(*it))));
+				break;
+			default:
+				Print_Debug(L"undefined type inside DRW_HatchLoop: \r\n", (*it)->eType);
+				break;
+			}
+		}
+
+		update();
+	}
+
+	DRW_HatchLoop(int t) {
+		type = t;
+		numedges = 0;
+		Print_Debug(L"New Delete DRW_HatchLoop() 0x%x\r\n", (void*)(this));
+	}
+
+	~DRW_HatchLoop() {
+		Print_Debug(L"New Delete ~DRW_HatchLoop() 0x%x\r\n", (void*)(this));
+		while (!objlist.empty()) {
+			delete objlist[objlist.size() - 1];
+			objlist.pop_back();
+		}
+	}
+
+	void update() {
+		numedges = objlist.size();
+	}
+
+public:
+	int type;               /*!< boundary path type, code 92, polyline=2, default=0 */
+	int numedges;           /*!< number of edges (if not a polyline), code 93 */
+							//TODO: store lwpolylines as entities
+							//    std::vector<DRW_LWPolyline *> pollist;  /*!< polyline list */
+	std::vector<DRW_Entity *> objlist;      /*!< entities list */
+};
+
+//! Class to handle hatch entity
+/*!
+*  Class to handle hatch entity
+*  @author Rallaz
+*/
+//TODO: handle lwpolylines, splines and ellipses
+class DRW_Hatch : public DRW_Point {
+	SETENTFRIENDS
+public:
+	DRW_Hatch(const DRW_Hatch& r) 
+	{
+		Print_Debug(L"New Delete DRW_Hatch() 0x%x\r\n", (void*)(this));
+		
+		ispol = r.ispol;
+		eType = r.eType;
+
+		solid = r.solid;
+		associative = r.associative;
+		hstyle = r.hstyle;
+		hpattern = r.hpattern;
+		doubleflag = r.doubleflag;
+		loopsnum = r.loopsnum;
+		angle = r.angle;
+		scale = r.scale;
+		basePoint = r.basePoint;
+		deflines = r.deflines;
+		
+		loop = NULL; //TBD: need further check here. can copy or not.
+
+		for (std::vector<DRW_HatchLoop *>::const_iterator it = r.looplist.begin(); it != r.looplist.end(); it++) 
+		{
+			looplist.push_back( new DRW_HatchLoop(* ((DRW_HatchLoop*)(*it)) ) );
+		}
+	}
+
+	DRW_Hatch() {
+		eType = DRW::HATCH;
+		angle = scale = 0.0;
+		basePoint.x = basePoint.y = basePoint.z = 0.0;
+		loopsnum = hstyle = associative = 0;
+		solid = hpattern = 1;
+		deflines = doubleflag = 0;
+		loop = NULL;
+		clearEntities();
+
+		Print_Debug(L"New Delete DRW_Hatch() 0x%x\r\n", (void*)(this));
+	}
+
+	~DRW_Hatch() {
+		Print_Debug(L"New Delete ~DRW_Hatch() 0x%x\r\n", (void*)(this));
+		while (!looplist.empty()) {
+			//Print_Debug(L"Delete Loop: 0x%x\r\n", (void*)(looplist[looplist.size() - 1]));
+			delete looplist[looplist.size() - 1];			
+			looplist.pop_back();
+		}
+	}
+
+	void appendLoop(DRW_HatchLoop *v) {
+		looplist.push_back(v);
+		//Print_Debug(L"Add Loop: 0x%x, 0x%x\r\n", (void*)(this), (void*)(v));
+	}
+
+	virtual void applyExtrusion() {}
+
+protected:
+	void parseCode(int code, dxfReader *reader);
+	virtual bool parseDwg(DRW::Version version, dwgBuffer *buf, duint32 bs = 0);
+
+public:
+	UTF8STRING name;           /*!< hatch pattern name, code 2 */
+	int solid;                 /*!< solid fill flag, code 70, solid=1, pattern=0 */
+	int associative;           /*!< associativity, code 71, associatve=1, non-assoc.=0 */
+	int hstyle;                /*!< hatch style, code 75 */
+	int hpattern;              /*!< hatch pattern type, code 76 */
+	int doubleflag;            /*!< hatch pattern double flag, code 77, double=1, single=0 */
+	int loopsnum;              /*!< namber of boundary paths (loops), code 91 */
+	double angle;              /*!< hatch pattern angle, code 52 */
+	double scale;              /*!< hatch pattern scale, code 41 */
+	int deflines;              /*!< number of pattern definition lines, code 78 */
+
+	std::vector<DRW_HatchLoop *> looplist;  /*!< polyline list */
+
+private:
+	void clearEntities() {
+		pt = line = NULL;
+		pline = NULL;
+		arc = NULL;
+		ellipse = NULL;
+		spline = NULL;
+		plvert = NULL;
+	}
+
+	void addLine() {
+		clearEntities();
+		if (loop) {
+			pt = line = new DRW_Line;
+			loop->objlist.push_back(line);
+		}
+	}
+
+	void addArc() {
+		clearEntities();
+		if (loop) {
+			pt = arc = new DRW_Arc;
+			loop->objlist.push_back(arc);
+		}
+	}
+
+	void addEllipse() {
+		clearEntities();
+		if (loop) {
+			pt = ellipse = new DRW_Ellipse;
+			loop->objlist.push_back(ellipse);
+		}
+	}
+
+	void addSpline() {
+		clearEntities();
+		if (loop) {
+			pt = NULL;
+			spline = new DRW_Spline;
+			loop->objlist.push_back(spline);
+		}
+	}
+
+	DRW_HatchLoop *loop;       /*!< current loop to add data */
+	DRW_Line *line;
+	DRW_Arc *arc;
+	DRW_Ellipse *ellipse;
+	DRW_Spline *spline;
+	DRW_LWPolyline *pline;
+	DRW_Point *pt;
+	DRW_Vertex2D *plvert;
+	bool ispol;
+};
 
 //used  //DRW_Coord basePoint;      /*!<  base point, code 10, 20 & 30 */
 

@@ -514,7 +514,13 @@ public:
         flags = 0;
         name = "*U0";
         isEnd = false;
+		Print_Debug(L"New Delete DRW_Block() 0x%x\r\n", (void*)(this));
     }
+
+	~DRW_Block() 
+	{
+		Print_Debug(L"New Delete ~DRW_Block() 0x%x\r\n", (void*)(this));
+	}
 
     virtual void applyExtrusion(){}
 
@@ -604,6 +610,8 @@ public:
 
     ~DRW_LWPolyline() {
         while (!vertlist.empty()) {
+			//delete and release memory before disconnect from the vector
+			delete vertlist[vertlist.size()-1];
             vertlist.pop_back();
         }
     }
@@ -800,6 +808,7 @@ public:
     }
     ~DRW_Polyline() {
         while (!vertlist.empty()) {
+		   delete vertlist[vertlist.size() - 1];
            vertlist.pop_back();
          }
     }
@@ -857,9 +866,11 @@ public:
     }
     ~DRW_Spline() {
         while (!controllist.empty()) {
+		   delete controllist[controllist.size() - 1];
            controllist.pop_back();
         }
         while (!fitlist.empty()) {
+		   delete fitlist[fitlist.size() - 1];
            fitlist.pop_back();
         }
     }
@@ -910,13 +921,13 @@ public:
     DRW_HatchLoop(int t) {
         type = t;
         numedges = 0;
+		Print_Debug(L"New Delete DRW_HatchLoop() 0x%x\r\n", (void*)(this));
     }
 
     ~DRW_HatchLoop() {
-/*        while (!pollist.empty()) {
-           pollist.pop_back();
-         }*/
+		Print_Debug(L"New Delete ~DRW_HatchLoop() 0x%x\r\n", (void*)(this));
         while (!objlist.empty()) {
+		   delete objlist[objlist.size() - 1];
            objlist.pop_back();
          }
     }
@@ -951,16 +962,22 @@ public:
         deflines = doubleflag = 0;
         loop = NULL;
         clearEntities();
+
+		Print_Debug(L"New Delete DRW_Hatch() 0x%x\r\n", (void*)(this));
     }
 
     ~DRW_Hatch() {
+		Print_Debug(L"New Delete ~DRW_Hatch() 0x%x\r\n", (void*)(this));
         while (!looplist.empty()) {
+			//Print_Debug(L"Delete Loop: 0x%x\r\n", (void*)(looplist[looplist.size() - 1]));
+		    //TBD: delete looplist[looplist.size() - 1];			
            looplist.pop_back();
          }
     }
 
     void appendLoop (DRW_HatchLoop *v) {
         looplist.push_back(v);
+		//Print_Debug(L"Add Loop: 0x%x, 0x%x\r\n", (void*)(this), (void*)(v));
     }
 
     virtual void applyExtrusion(){}
@@ -1403,6 +1420,7 @@ public:
     }
     ~DRW_Leader() {
         while (!vertexlist.empty()) {
+		   delete vertexlist[vertexlist.size() - 1];
            vertexlist.pop_back();
         }
     }

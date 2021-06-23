@@ -1790,7 +1790,7 @@ void DRW_Hatch::parseCode(int code, dxfReader *reader){
         break;
     case 92:
         loop = new DRW_HatchLoop(reader->getInt32());
-        looplist.push_back(loop);
+		this->appendLoop(loop);        
         if (reader->getInt32() & 2) {
             ispol = true;
             clearEntities();
@@ -1947,7 +1947,7 @@ bool DRW_Hatch::parseDwg(DRW::Version version, dwgBuffer *buf, duint32 bs){
             loop->objlist.push_back(pline);
         }//end polyline
         loop->update();
-        looplist.push_back(loop);
+		this->appendLoop(loop);
         totalBoundItems += buf->getBitLong();
         DRW_DBG(" totalBoundItems: "); DRW_DBG(totalBoundItems);
     } //end read loops

@@ -26,11 +26,22 @@ public:
 //container class to store entites.
 class dx_ifaceBlock : public DRW_Block {
 public:
-    dx_ifaceBlock(){}
-    dx_ifaceBlock(const DRW_Block& p):DRW_Block(p){}
-    ~dx_ifaceBlock(){
-        for (std::list<DRW_Entity*>::const_iterator it=ent.begin(); it!=ent.end(); ++it)
-            delete *it;
+    dx_ifaceBlock()
+	{
+		Print_Debug(L"New Delete dx_ifaceBlock() 0x%x\r\n", (void*)(this));
+	}
+    dx_ifaceBlock(const DRW_Block& p):DRW_Block(p)
+	{
+		Print_Debug(L"New Delete dx_ifaceBlock() 0x%x\r\n", (void*)(this));
+	}
+    ~dx_ifaceBlock()
+	{
+		Print_Debug(L"New Delete ~dx_ifaceBlock() 0x%x\r\n", (void*)(this));
+		for (std::list<DRW_Entity*>::const_iterator it = ent.begin(); it != ent.end(); ++it)
+		{
+			delete *it;
+		}
+		ent.clear();
     }
     std::list<DRW_Entity*>ent; //stores the entities list
 };
@@ -39,14 +50,20 @@ public:
 //container class to store full dwg/dxf data.
 class dx_data {
 public:
-    dx_data(){
+    dx_data(){		
         mBlock = new dx_ifaceBlock();
+		Print_Debug(L"New Delete dx_data() 0x%x\r\n", (void*)(this));
     }
     ~dx_data(){
+		Print_Debug(L"New Delete ~dx_data() 0x%x\r\n", (void*)(this));
         //cleanup,
-        for (std::list<dx_ifaceBlock*>::const_iterator it=blocks.begin(); it!=blocks.end(); ++it)
-            delete *it;
         delete mBlock;
+		
+		for (std::list<dx_ifaceBlock*>::const_iterator it = blocks.begin(); it != blocks.end(); ++it)
+		{
+			delete *it;
+		}
+		blocks.clear();
     }
 
     DRW_Header headerC;                 //stores a copy of the header vars

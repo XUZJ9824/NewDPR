@@ -212,20 +212,25 @@ public:
         COORD,
         INVALID
     };
+#ifdef _DEBUG
+	static int cnt_DRW_Variant;
+#endif 
 //TODO: add INT64 support
-    DRW_Variant(): sdata(std::string()), vdata(), content(0), vType(INVALID), vCode(0) {}
+	DRW_Variant() : sdata(std::string()), vdata(), content(0), vType(INVALID), vCode(0) { cnt_DRW_Variant++; }
 
-    DRW_Variant(int c, dint32 i): sdata(std::string()), vdata(), content(i), vType(INTEGER), vCode(c){}
+    DRW_Variant(int c, dint32 i): sdata(std::string()), vdata(), content(i), vType(INTEGER), vCode(c){ cnt_DRW_Variant++; }
 
-    DRW_Variant(int c, duint32 i): sdata(std::string()), vdata(), content(static_cast<dint32>(i)), vType(INTEGER), vCode(c) {}
+    DRW_Variant(int c, duint32 i): sdata(std::string()), vdata(), content(static_cast<dint32>(i)), vType(INTEGER), vCode(c) { cnt_DRW_Variant++; }
 
-    DRW_Variant(int c, double d): sdata(std::string()), vdata(), content(d), vType(DOUBLE), vCode(c) {}
+    DRW_Variant(int c, double d): sdata(std::string()), vdata(), content(d), vType(DOUBLE), vCode(c) { cnt_DRW_Variant++; }
 
-    DRW_Variant(int c, UTF8STRING s): sdata(s), vdata(), content(&sdata), vType(STRING), vCode(c) {}
+    DRW_Variant(int c, UTF8STRING s): sdata(s), vdata(), content(&sdata), vType(STRING), vCode(c) { cnt_DRW_Variant++; }
 
-    DRW_Variant(int c, DRW_Coord crd): sdata(std::string()), vdata(crd), content(&vdata), vType(COORD), vCode(c) {}
+    DRW_Variant(int c, DRW_Coord crd): sdata(std::string()), vdata(crd), content(&vdata), vType(COORD), vCode(c) { cnt_DRW_Variant++; }
 
     DRW_Variant(const DRW_Variant& d): sdata(d.sdata), vdata(d.vdata), content(d.content), vType(d.vType), vCode(d.vCode) {
+		cnt_DRW_Variant++;
+
         if (d.vType == COORD)
             content.v = &vdata;
         if (d.vType == STRING)
@@ -233,6 +238,10 @@ public:
     }
 
     ~DRW_Variant() {
+#ifdef CHECK_MEMORY
+		cnt_DRW_Variant--;
+		Print_Debug(L"~DRW_Variant(%d)\r\n", cnt_DRW_Variant);
+#endif
     }
 
     void addString(int c, UTF8STRING s) {vType = STRING; sdata = s; content.s = &sdata; vCode=c;}

@@ -121,6 +121,7 @@ public:
 	CLineGeometry(CPointF stPt, CPointF endPt);
 
 	~CLineGeometry();
+	static int cntCLineGeometry;
 
 	CPointF m_startPoint;
 	CPointF m_endPoint;
@@ -232,7 +233,28 @@ public:
 	~CAirportMapEntities();
 
 	bool AddEntity(CEntity *pEntity);
-	void ClearEntity();
+	void ClearEntity() 
+	{
+		for (std::vector<CLineEntity*>::const_iterator it = m_lstLines.begin(); it != m_lstLines.end(); it++)
+		{
+			delete *it;
+		}
+
+		for (std::vector<CPolygonEntity*>::const_iterator it = m_lstPolygons.begin(); it != m_lstPolygons.end(); it++)
+		{
+			delete *it;
+		}
+
+		for (std::vector<CPolylineEntity*>::const_iterator it = m_lstPolyLines.begin(); it != m_lstPolyLines.end(); it++)
+		{
+			delete *it;
+		}
+
+		for (std::vector<CTextEntity*>::const_iterator it = m_lstTexts.begin(); it != m_lstTexts.end(); it++)
+		{
+			delete *it;
+		}
+	}
 
 	std::vector<CLineEntity*>		m_lstLines;
 	std::vector<CPolygonEntity*>	m_lstPolygons;

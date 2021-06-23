@@ -28,15 +28,15 @@ class dx_ifaceBlock : public DRW_Block {
 public:
     dx_ifaceBlock()
 	{
-		Print_Debug(L"New Delete dx_ifaceBlock() 0x%x\r\n", (void*)(this));
+		Print_Debug(L"dx_ifaceBlock() 0x%x\r\n", (void*)(this));
 	}
     dx_ifaceBlock(const DRW_Block& p):DRW_Block(p)
 	{
-		Print_Debug(L"New Delete dx_ifaceBlock() 0x%x\r\n", (void*)(this));
+		Print_Debug(L"dx_ifaceBlock() 0x%x\r\n", (void*)(this));
 	}
     ~dx_ifaceBlock()
 	{
-		Print_Debug(L"New Delete ~dx_ifaceBlock() 0x%x\r\n", (void*)(this));
+		Print_Debug(L"~dx_ifaceBlock() 0x%x\r\n", (void*)(this));
 		for (std::list<DRW_Entity*>::const_iterator it = ent.begin(); it != ent.end(); ++it)
 		{
 			delete *it;
@@ -52,10 +52,10 @@ class dx_data {
 public:
     dx_data(){		
         mBlock = new dx_ifaceBlock();
-		Print_Debug(L"New Delete dx_data() 0x%x\r\n", (void*)(this));
+		Print_Debug(L"dx_data() 0x%x\r\n", (void*)(this));
     }
     ~dx_data(){
-		Print_Debug(L"New Delete ~dx_data() 0x%x\r\n", (void*)(this));
+		Print_Debug(L"~dx_data() 0x%x\r\n", (void*)(this));
         //cleanup,
         delete mBlock;
 		

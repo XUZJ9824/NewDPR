@@ -19,6 +19,8 @@
 #include "intern/drw_dbg.h"
 #include "intern/dwgutil.h"
 
+int DRW_Variant::cnt_DRW_Variant = 0;
+
 //! Base class for tables entries
 /*!
 *  Base class for tables entries

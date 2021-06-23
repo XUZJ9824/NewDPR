@@ -15,7 +15,7 @@
 #include "dx_iface.h"
 #include "libdwgr.h"
 #include "libdxfrw.h"
-
+#include "commonDefs.h"
 
 bool dx_iface::fileImport(const std::string& fileI, dx_data *fData){
     unsigned int found = fileI.find_last_of(".");
@@ -115,3 +115,56 @@ void dx_iface::writeEntity(DRW_Entity* e){
         break;
     }
 }
+
+#ifdef CHECK_MEMORY
+/*
+class DRW_Point;
+class DRW_Line;
+class DRW_Ray;
+class DRW_Xline;
+class DRW_Circle;
+class DRW_Arc;
+class DRW_Ellipse;
+class DRW_Trace;
+class DRW_Solid;
+class DRW_3Dface;
+class DRW_Block;
+class DRW_Insert;
+class DRW_LWPolyline;
+class DRW_Text;
+class DRW_MText;
+class DRW_Vertex;
+class DRW_Polyline;
+class DRW_Spline;
+class DRW_Hatch;
+class DRW_Image;
+class DRW_Dimension;
+class DRW_DimAligned;
+class DRW_DimLinear;
+class DRW_DimRadial;
+class DRW_DimDiametric;
+class DRW_DimAngular;
+class DRW_DimAngular3p;
+class DRW_DimOrdinate;
+class DRW_Leader;
+class DRW_Viewport;
+*/
+void Show_Dwg_Entity_Size()
+{
+	PRINT_SIZE(DRW_Line)
+	PRINT_SIZE(DRW_Point)
+	PRINT_SIZE(DRW_Circle)
+	PRINT_SIZE(DRW_Polyline)
+	PRINT_SIZE(DRW_Text)
+	PRINT_SIZE(DRW_Insert)
+	PRINT_SIZE(DRW_Block)
+	PRINT_SIZE(DRW_Hatch)
+	PRINT_SIZE(DRW_HatchLoop)
+	PRINT_SIZE(DRW_LWPolyline)
+	PRINT_SIZE(DRW_Variant)
+	PRINT_SIZE(DRW_Vertex)
+	PRINT_SIZE(DRW_Vertex2D)
+	PRINT_SIZE(DRW_Viewport)
+	PRINT_SIZE(DRW_Coord)
+}
+#endif 

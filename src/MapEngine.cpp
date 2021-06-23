@@ -425,3 +425,13 @@ dx_ifaceBlock* CMapEngine::FindBlock(std::string strBlock)
 
 	return rt;
 }
+
+#ifdef CHECK_MEMORY
+void Check_Size_Engine()
+{
+	PRINT_SIZE(CMapLayer)
+	PRINT_SIZE(CPointF)
+	PRINT_SIZE(CEntity)
+	PRINT_SIZE(CLineGeometry)	
+}
+#endif //

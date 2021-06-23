@@ -545,12 +545,12 @@ public:
         flags = 0;
         name = "*U0";
         isEnd = false;
-		Print_Debug(L"New Delete DRW_Block() 0x%x\r\n", (void*)(this));
+		Print_Debug(L"DRW_Block(%d) 0x%x\r\n", sizeof(DRW_Block), (void*)(this));
     }
 
 	~DRW_Block() 
 	{
-		Print_Debug(L"New Delete ~DRW_Block() 0x%x\r\n", (void*)(this));
+		Print_Debug(L"~DRW_Block() 0x%x\r\n", (void*)(this));
 	}
 
     virtual void applyExtrusion(){}
@@ -1402,7 +1402,7 @@ class DRW_HatchLoop {
 public:
 	DRW_HatchLoop(const DRW_HatchLoop& r)
 	{
-		Print_Debug(L"New Delete DRW_HatchLoop() 0x%x\r\n", (void*)(this));
+		Print_Debug(L"DRW_HatchLoop(%d) 0x%x\r\n", sizeof(DRW_HatchLoop), (void*)(this));
 
 		type = r.type;
 		numedges = r.numedges;
@@ -1432,7 +1432,7 @@ public:
 				objlist.push_back(new DRW_DimLinear(*((DRW_DimLinear*)(*it))));
 				break;
 			case DRW::DIMRADIAL:
-				objlist.push_back(new DRW_Arc(*((DRW_Arc*)(*it))));
+				objlist.push_back(new DRW_DimRadial(*((DRW_DimRadial*)(*it))));
 				break;
 			case DRW::DIMDIAMETRIC:
 				objlist.push_back(new DRW_DimDiametric(*((DRW_DimDiametric*)(*it))));
@@ -1515,11 +1515,11 @@ public:
 	DRW_HatchLoop(int t) {
 		type = t;
 		numedges = 0;
-		Print_Debug(L"New Delete DRW_HatchLoop() 0x%x\r\n", (void*)(this));
+		//Print_Debug(L"DRW_HatchLoop(%d) 0x%x\r\n", sizeof(DRW_HatchLoop), (void*)(this));
 	}
 
 	~DRW_HatchLoop() {
-		Print_Debug(L"New Delete ~DRW_HatchLoop() 0x%x\r\n", (void*)(this));
+		//Print_Debug(L"~DRW_HatchLoop() 0x%x\r\n", (void*)(this));
 		while (!objlist.empty()) {
 			delete objlist[objlist.size() - 1];
 			objlist.pop_back();
@@ -1549,7 +1549,7 @@ class DRW_Hatch : public DRW_Point {
 public:
 	DRW_Hatch(const DRW_Hatch& r) 
 	{
-		Print_Debug(L"New Delete DRW_Hatch() 0x%x\r\n", (void*)(this));
+		Print_Debug(L"DRW_Hatch(%d) 0x%x\r\n", sizeof(DRW_Hatch), (void*)(this));
 		
 		ispol = r.ispol;
 		eType = r.eType;
@@ -1583,11 +1583,11 @@ public:
 		loop = NULL;
 		clearEntities();
 
-		Print_Debug(L"New Delete DRW_Hatch() 0x%x\r\n", (void*)(this));
+		Print_Debug(L"DRW_Hatch(%d) 0x%x\r\n", sizeof(DRW_Hatch), (void*)(this));
 	}
 
 	~DRW_Hatch() {
-		Print_Debug(L"New Delete ~DRW_Hatch() 0x%x\r\n", (void*)(this));
+		//Print_Debug(L"~DRW_Hatch() 0x%x\r\n", (void*)(this));
 		while (!looplist.empty()) {
 			//Print_Debug(L"Delete Loop: 0x%x\r\n", (void*)(looplist[looplist.size() - 1]));
 			delete looplist[looplist.size() - 1];			

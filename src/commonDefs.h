@@ -119,3 +119,13 @@ std::wstring ReplaceWCSWithPattern(const std::wstring &message, const std::wstri
 //////////////////////////Drawing Settings////////////////////////////
 #define TOTAL_DRAW_LAYERS 3
 const WCHAR * sDrawLayers[];
+
+///Debug & Check size///
+#ifdef CHECK_MEMORY
+template <int s> struct Wow;
+struct foo
+{
+	int a, b;
+};
+#define PRINT_SIZE(x) Wow<sizeof(x)> sz ## x;
+#endif //CHECK_MEMORY

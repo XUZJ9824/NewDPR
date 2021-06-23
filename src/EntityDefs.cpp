@@ -22,13 +22,18 @@ CEntity::CEntity():
 {}
 CEntity::~CEntity() {};
 
+int CLineGeometry::cntCLineGeometry = 0;
 CLineGeometry::CLineGeometry() 
 {
-	Print_Debug(_T("New CLineGeometry\r\n"));
+	Print_Debug(_T("CLineGeometry\r\n"));
+	cntCLineGeometry++;
 }
+
 CLineGeometry::CLineGeometry(CPointF stPt, CPointF endPt)
 {
-	Print_Debug(_T("New CLineGeometry(%.3f,%.3f) to (%.3f,%.3f)\r\n"),
+	cntCLineGeometry++;
+
+	Print_Debug(_T("CLineGeometry(%.3f,%.3f) to (%.3f,%.3f)\r\n"),
 		stPt.X, stPt.Y,
 		endPt.X, endPt.Y);
 
@@ -39,23 +44,26 @@ CLineGeometry::CLineGeometry(CPointF stPt, CPointF endPt)
 
 CLineGeometry::~CLineGeometry() 
 {	
-	cout << "Delete CLineGeometry" << std::endl;
+#ifdef CHECK_MEMORY
+	cntCLineGeometry--;
+	Print_Debug(_T("~CLineGeometry(%d)\r\n"), cntCLineGeometry);
+#endif //
+	
 }
 
 CLineEntity::CLineEntity()	
 {
 	m_Type = eLineEntity;
-	Print_Debug(_T("New CLineEntity\r\n"));
+	Print_Debug(_T("CLineEntity()\r\n"));
 };
 
 CLineEntity::~CLineEntity() 
 {
-	cout << "Delete CLineEntity" << std::endl;
+	//Print_Debug(_T("~CLineEntity()\r\n"));
 
 	for (std::vector<CLineGeometry*>::const_iterator it = m_lstLineGeometries.begin(); it != m_lstLineGeometries.end(); it++)
 	{
-		CLineGeometry *pitem = *it;
-		delete pitem;		
+		delete *it;	
 	}
 	m_lstLineGeometries.clear();
 };
@@ -97,7 +105,7 @@ void CEntity::SetDwgColor(int iDwgColor, DRW_Block* pDwgBlk)
 
 CPolygonEntity::CPolygonEntity()	
 {
-	Print_Debug(_T("New CPolygonEntity\r\n"));
+	Print_Debug(_T("CPolygonEntity()\r\n"));
 	m_Type = ePolygonEntity;
 }
 
@@ -115,22 +123,20 @@ CPolygonEntity::~CPolygonEntity()
 
 CPolylineEntity::CPolylineEntity()	
 {
-	Print_Debug(_T("New CPolylineEntity\r\n"));
+	Print_Debug(_T("CPolylineEntity()\r\n"));
 	m_Type = ePolylineEntity;
 };
+
 CPolylineEntity::~CPolylineEntity() 
 {
-	cout << "Delete CPolylineEntity" << std::endl;
+	//Print_Debug(_T("~CPolylineEntity\r\n"));	
 
-	std::vector<CLineGeometry*> m_lstLines;
-
-	for (std::vector<CLineGeometry*>::const_iterator it = m_lstLines.begin(); it != m_lstLines.end(); it++)
+	for (std::vector<CLineGeometry*>::const_iterator it = m_lstLineGeometries.begin(); it != m_lstLineGeometries.end(); it++)
 	{
-		CLineGeometry *pitem = *it;
-		delete pitem;
-	}
-	m_lstLines.clear();
+		delete *it;		
+	}	
 };
+
 void CPolylineEntity::AddSegment(CLineGeometry *pSegment)
 {
 	m_lstLineGeometries.push_back(pSegment);
@@ -138,44 +144,19 @@ void CPolylineEntity::AddSegment(CLineGeometry *pSegment)
 
 CTextEntity::CTextEntity()	
 {
-	Print_Debug(_T("New CTextEntity\r\n"));
+	Print_Debug(_T("CTextEntity()\r\n"));
 	m_Type = eTextEntity;
 };
+
 CTextEntity::~CTextEntity()
 {
-	cout << "Delete CTextEntity" << std::endl;
+	//Print_Debug(_T("~CTextEntity()\r\n"));
 }
 
 CAirportMapEntities::CAirportMapEntities() {};
 CAirportMapEntities::~CAirportMapEntities() 
 {
-	for (std::vector<CLineEntity*>::const_iterator it = m_lstLines.begin(); it != m_lstLines.end(); it++)
-	{
-		CLineEntity *pitem = *it;
-		delete pitem;
-	}
-	m_lstLines.clear();
-
-	for (std::vector<CPolygonEntity*>::const_iterator it = m_lstPolygons.begin(); it != m_lstPolygons.end(); it++)
-	{
-		CPolygonEntity *pitem = *it;
-		delete pitem;
-	}
-	m_lstPolygons.clear();
-
-	for (std::vector<CPolylineEntity*>::const_iterator it = m_lstPolyLines.begin(); it != m_lstPolyLines.end(); it++)
-	{
-		CPolylineEntity *pitem = *it;
-		delete pitem;
-	}
-	m_lstPolyLines.clear();
-
-	for (std::vector<CTextEntity*>::const_iterator it = m_lstTexts.begin(); it != m_lstTexts.end(); it++)
-	{
-		CTextEntity *pitem = *it;
-		delete pitem;
-	}
-	m_lstTexts.clear();
+	ClearEntity();
 };
 
 bool CAirportMapEntities::AddEntity(CEntity *pEntity) 
